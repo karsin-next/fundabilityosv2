@@ -128,16 +128,18 @@ export default function InterviewPage() {
         const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
 
         for (const line of lines) {
+          let json: any = null;
           try {
-            const json = JSON.parse(line.slice(6));
-            if (json.error) throw new Error(json.error);
-            if (json.done) break;
-            if (json.delta) {
-              full += json.delta;
-              setStreamingContent(full);
-            }
+            json = JSON.parse(line.slice(6));
           } catch {
-            // skip malformed lines
+            continue; // skip malformed lines
+          }
+          
+          if (json.error) throw new Error(json.error);
+          if (json.done) break;
+          if (json.delta) {
+            full += json.delta;
+            setStreamingContent(full);
           }
         }
       }
