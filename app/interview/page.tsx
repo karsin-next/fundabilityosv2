@@ -128,6 +128,7 @@ export default function InterviewPage() {
         const lines = chunk.split("\n").filter((l) => l.startsWith("data: "));
 
         for (const line of lines) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           let json: any = null;
           try {
             json = JSON.parse(line.slice(6));
