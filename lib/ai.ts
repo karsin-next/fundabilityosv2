@@ -18,7 +18,7 @@ export function getAnthropicClient(): Anthropic {
 
 // Model constants — haiku for speed, sonnet for depth
 export const MODELS = {
-  CHAT:      "claude-3-haiku-20240307",   // Real-time interview streaming
+  CHAT:      "claude-3-5-sonnet-20241022",   // Real-time interview streaming
   ANALYSIS:  "claude-3-5-sonnet-20241022",  // Scoring, PDF extraction, self-evolution
 } as const;
 
