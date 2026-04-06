@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getAnthropicClient } from "@/lib/ai";
+import { getAnthropicClient, MODELS } from "@/lib/ai";
 import { sendTelegramAlert } from "@/lib/telegram";
 
 export const runtime = "nodejs";
@@ -82,7 +82,7 @@ Output strictly in JSON format matching this schema:
 
     // 6. Invoke Claude Sonnet
     const msg = await getAnthropicClient().messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: MODELS.ANALYSIS,
       max_tokens: 500,
       temperature: 0.2,
       system: "Return only raw JSON. No markdown wrappers.",
