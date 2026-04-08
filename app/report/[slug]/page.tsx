@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
-import { Home, Share2, CheckCircle, AlertTriangle, Lock } from "lucide-react";
+import { Home, Share2, CheckCircle, AlertTriangle, Lock, FileDown } from "lucide-react";
 import UnlockButton from "@/components/report/UnlockButton";
 import ScoreGaugeMock from "@/components/score/ScoreGaugeMock";
 
@@ -83,9 +83,18 @@ export default async function ReportPage({ params }: PageProps) {
               {isUnlocked ? "UNLOCKED" : "LOCKED PREVIEW"}
             </span>
             {isUnlocked && (
-              <button className="btn btn-sm btn-ghost-dark">
-                <Share2 size={14} /> Share Link
-              </button>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <a href={`/api/report/${slug}/pdf`} target="_blank" className="btn btn-sm btn-primary">
+                  <FileDown size={14} /> Download PDF
+                </a>
+                <button className="btn btn-sm btn-ghost-dark" onClick={(e) => {
+                  navigator.clipboard.writeText(window.location.href);
+                  (e.target as HTMLButtonElement).innerText = "Copied!";
+                  setTimeout(() => { if (e.target) (e.target as HTMLButtonElement).innerText = "Share Link"; }, 2000);
+                }}>
+                  <Share2 size={14} /> Share Link
+                </button>
+              </div>
             )}
           </div>
         </div>
