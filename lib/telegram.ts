@@ -1,7 +1,3 @@
-interface TelegramMessage {
-  text: string;
-}
-
 export async function sendTelegramAlert(message: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN || "8723177584:AAEP7S14my6W6ABBSQ1bCgj5hLxMZ-L14eo";
   const chatId = process.env.TELEGRAM_CHAT_ID || "995198028"; // KarSin Ng numeric chat ID

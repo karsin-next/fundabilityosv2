@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { ScoringResult } from "@/lib/scoring";
 
 // Optionally register a font, but we'll stick to standard Helvetica for max compatibility 

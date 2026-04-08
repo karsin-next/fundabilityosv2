@@ -37,6 +37,7 @@ export async function GET(
 
     // Render the React component to a Node stream
     const pdfStream = await renderToStream(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       React.createElement(FundabilityReportPDF, { report }) as any
     );
 

@@ -66,7 +66,6 @@ export default function InterviewPage() {
       setErrorMsg(err instanceof Error ? err.message : "Connection failed");
       setState("error");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Initialize the first question precisely once

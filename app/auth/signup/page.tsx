@@ -14,7 +14,6 @@ const PERKS = [
 ];
 
 function SignupContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const referralCode = searchParams.get("ref") || "";
 
