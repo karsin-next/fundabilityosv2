@@ -68,16 +68,19 @@ export default function InterviewPage() {
           if (line.startsWith("data: ")) {
             const rawData = line.slice(6).trim();
             if (!rawData) continue;
+            let parsed;
             try {
-              const parsed = JSON.parse(rawData);
-              if (parsed.delta) {
-                jsonString += parsed.delta;
-              }
-              if (parsed.error) {
-                throw new Error("AI Error: " + parsed.error);
-              }
+              parsed = JSON.parse(rawData);
             } catch (e) {
               console.warn("Partial parse error or internal flag:", e, rawData);
+              continue;
+            }
+
+            if (parsed.delta) {
+              jsonString += parsed.delta;
+            }
+            if (parsed.error) {
+              throw new Error("AI Error: " + parsed.error);
             }
           }
         }
@@ -148,16 +151,19 @@ export default function InterviewPage() {
           if (line.startsWith("data: ")) {
             const rawData = line.slice(6).trim();
             if (!rawData) continue;
+            let parsed;
             try {
-              const parsed = JSON.parse(rawData);
-              if (parsed.delta) {
-                jsonString += parsed.delta;
-              }
-              if (parsed.error) {
-                throw new Error("Scoring Error: " + parsed.error);
-              }
+              parsed = JSON.parse(rawData);
             } catch (e) {
               console.warn("Partial scoring parse error:", e, rawData);
+              continue;
+            }
+
+            if (parsed.delta) {
+              jsonString += parsed.delta;
+            }
+            if (parsed.error) {
+              throw new Error("Scoring Error: " + parsed.error);
             }
           }
         }
