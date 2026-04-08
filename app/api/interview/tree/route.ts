@@ -40,9 +40,10 @@ export async function POST(req: NextRequest) {
 
           controller.enqueue(encoder.encode("data: {\"done\": true}\n\n"));
           controller.close();
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error("[Stream Error]:", err);
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`));
+          const errorMessage = err instanceof Error ? err.message : "Stream error";
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`));
           controller.close();
         }
       },
@@ -56,10 +57,12 @@ export async function POST(req: NextRequest) {
       },
     });
     
-  } catch (err: any) {
+    
+  } catch (err: unknown) {
     console.error("[Dynamic Tree API Error]:", err);
+    const errorMessage = err instanceof Error ? err.message : "Internal Server Error";
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Internal Server Error" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

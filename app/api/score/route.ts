@@ -67,9 +67,10 @@ Remember: output ONLY the JSON schema. No preamble, no explanation.`;
 
           controller.enqueue(encoder.encode("data: {\"done\": true}\n\n"));
           controller.close();
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error("[Scoring Stream Error]:", err);
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`));
+          const errorMessage = err instanceof Error ? err.message : "Scoring stream error";
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`));
           controller.close();
         }
       },
@@ -83,7 +84,7 @@ Remember: output ONLY the JSON schema. No preamble, no explanation.`;
       },
     });
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[Scoring API Error]:", err);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), { 
       status: 500, 
