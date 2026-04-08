@@ -47,7 +47,48 @@ export default function InterviewPage() {
       });
       
       if (!res.ok) throw new Error("Failed to load next question");
-      const data = await res.json();
+
+      // Handle the stream
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("Stream failed to initialize");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let jsonString = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const rawData = line.slice(6).trim();
+            if (!rawData) continue;
+            try {
+              const parsed = JSON.parse(rawData);
+              if (parsed.delta) {
+                jsonString += parsed.delta;
+              }
+              if (parsed.error) {
+                throw new Error("AI Error: " + parsed.error);
+              }
+            } catch (e) {
+              console.warn("Partial parse error or internal flag:", e, rawData);
+            }
+          }
+        }
+      }
+
+      if (!jsonString) throw new Error("AI returned empty response");
+      
+      // Final attempt to clean and parse the aggregated JSON string
+      const data = JSON.parse(
+        jsonString.replace(/```json/g, "").replace(/```/g, "").trim()
+      );
 
       if (data.type === "complete") {
         // Trigger the final score API using the structured payload Claude generated
@@ -86,7 +127,48 @@ export default function InterviewPage() {
         body: JSON.stringify({ answers: structuredData }),
       });
       if (!res.ok) throw new Error("Analysis failed");
-      const result: ScoringResult = await res.json();
+
+      // Handle the stream
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("Scoring stream failed to initialize");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let jsonString = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const rawData = line.slice(6).trim();
+            if (!rawData) continue;
+            try {
+              const parsed = JSON.parse(rawData);
+              if (parsed.delta) {
+                jsonString += parsed.delta;
+              }
+              if (parsed.error) {
+                throw new Error("Scoring Error: " + parsed.error);
+              }
+            } catch (e) {
+              console.warn("Partial scoring parse error:", e, rawData);
+            }
+          }
+        }
+      }
+
+      if (!jsonString) throw new Error("AI returned empty scoring response");
+      
+      const result: ScoringResult = JSON.parse(
+        jsonString.replace(/```json/g, "").replace(/```/g, "").trim()
+      );
+
       setScoringResult(result);
       setState("done");
     } catch (err) {

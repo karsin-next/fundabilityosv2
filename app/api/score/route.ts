@@ -1,39 +1,93 @@
-import { NextRequest, NextResponse } from "next/server";
-import { claudeScore } from "@/lib/scoring";
+import { NextRequest } from "next/server";
+import { getAnthropicClient, MODELS } from "@/lib/ai";
+import { SCORING_SYSTEM_PROMPT } from "@/lib/prompts";
 import { trackEvent } from "@/lib/analytics";
 import { sendTelegramAlert } from "@/lib/telegram";
 
 export const runtime = "nodejs";
-export const maxDuration = 90;
 
 export async function POST(req: NextRequest) {
-  let body: { answers: Record<string, unknown>; sessionId?: string };
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+    const { answers, sessionId } = await req.json();
 
-  if (!body?.answers) {
-    return NextResponse.json({ error: "answers is required" }, { status: 400 });
-  }
+    if (!answers) {
+      return new Response(JSON.stringify({ error: "answers is required" }), { 
+        status: 400, 
+        headers: { "Content-Type": "application/json" } 
+      });
+    }
 
-  try {
-    const result = await claudeScore(body.answers);
-    
-    // Trigger Analytics and Telegram Alert
-    await trackEvent("assessment_completed", {
-      sessionId: body.sessionId,
-      score: result.score,
-      eventData: { band: result.band }
+    const anthropic = getAnthropicClient();
+    const prompt = `Here is the founder's interview data. Score this startup according to the rubric.
+
+INTERVIEW DATA:
+${JSON.stringify(answers, null, 2)}
+
+Remember: output ONLY the JSON schema. No preamble, no explanation.`;
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        let fullResponse = "";
+        try {
+          const anthropicStream = await anthropic.messages.stream({
+            model: MODELS.ANALYSIS,
+            max_tokens: 2500,
+            temperature: 0.1,
+            system: SCORING_SYSTEM_PROMPT,
+            messages: [{ role: "user", content: prompt }],
+          });
+
+          for await (const chunk of anthropicStream) {
+            if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
+              const text = chunk.delta.text;
+              fullResponse += text;
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: text })}\n\n`));
+            }
+          }
+
+          // Once complete, attempt to parse the full response to trigger notifications
+          try {
+            const jsonMatch = fullResponse.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              const result = JSON.parse(jsonMatch[0]);
+              
+              // Background tasks (non-blocking for the stream closure)
+              trackEvent("assessment_completed", {
+                sessionId,
+                score: result.score,
+                eventData: { band: result.band }
+              }).catch(console.error);
+
+              sendTelegramAlert(`🤖 <b>AI Assessment Completed</b>\nScore: ${result.score}/100 (${result.band})\nTop Gap: ${result.top_3_gaps?.[0]?.dimension || "N/A"}`).catch(console.error);
+            }
+          } catch (e) {
+            console.error("[Scoring Post-Processing Error]:", e);
+          }
+
+          controller.enqueue(encoder.encode("data: {\"done\": true}\n\n"));
+          controller.close();
+        } catch (err: any) {
+          console.error("[Scoring Stream Error]:", err);
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`));
+          controller.close();
+        }
+      },
     });
-    
-    await sendTelegramAlert(`🤖 <b>AI Assessment Completed</b>\nScore: ${result.score}/100 (${result.band})\nTop Gap: ${result.top_3_gaps?.[0]?.dimension || "N/A"}`);
 
-    return NextResponse.json(result);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Scoring failed";
-    console.error("[score] Error:", message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
+    });
+
+  } catch (err: any) {
+    console.error("[Scoring API Error]:", err);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), { 
+      status: 500, 
+      headers: { "Content-Type": "application/json" } 
+    });
   }
 }
