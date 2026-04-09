@@ -1,166 +1,111 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/#how-it-works", label: "How It Works" },
-  { href: "/academy", label: "Academy" },
-  { href: "/#pricing", label: "Pricing" },
-  { href: "/directory", label: "Investors" },
-];
+import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter, usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
-  const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const supabase = createClient();
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Hide Navbar on specific app pages that need 100vh / dedicated sidebar
-  const hideNavRoutes = ["/dashboard", "/interview", "/upload", "/checkout"];
+  // Hide Navbar on dashboard/app routes that have their own sidebar nav
+  const hideNavRoutes = ["/dashboard", "/interview", "/upload", "/checkout", "/investor/dashboard"];
   const shouldHide = hideNavRoutes.some((route) => pathname?.startsWith(route));
-
   if (shouldHide) return null;
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setMenuOpen(false);
+    router.push("/");
+    router.refresh();
+  };
+
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        backgroundColor: scrolled
-          ? "rgba(2, 47, 66, 0.97)"
-          : "rgba(2, 47, 66, 0.92)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        borderBottom: scrolled ? "1px solid rgba(255,216,0,0.12)" : "1px solid transparent",
-        transition: "all 0.3s ease",
-      }}
-    >
-      <div
-        className="container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: "68px",
-        }}
-      >
+    <header className="sticky top-0 z-50 bg-[#022f42] py-3 px-6 md:px-8 border-b-[3px] border-[#ffd800] w-full">
+      <div className="max-w-[1280px] mx-auto flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-          <span
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontWeight: 900,
-              fontSize: "1.15rem",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              color: "var(--white)",
-            }}
-          >
-            Fundability
-            <span style={{ color: "var(--yellow)" }}>OS</span>
-          </span>
+        <Link href="/" className="flex items-center gap-3 group" onClick={() => setMenuOpen(false)}>
+          <Image
+            src="/logo.png"
+            alt="NextBlaze Logo"
+            width={200}
+            height={56}
+            className="h-10 md:h-14 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            priority
+          />
+          <div className="flex flex-col border-l border-white/20 pl-3">
+            <span className="text-white font-black text-lg md:text-xl tracking-tight leading-none uppercase">NextBlaze</span>
+            <span className="text-[#ffd800] text-[9px] font-black uppercase tracking-[0.2em] mt-0.5">SaaS Solutions</span>
+          </div>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "2.25rem",
-          }}
-          className="desktop-nav"
+        {/* Mobile toggle */}
+        <button
+          className="md:hidden text-[#ffd800] text-3xl focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`nav-link ${
-                pathname === link.href ? "nav-link-active" : ""
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          ☰
+        </button>
+
+        {/* Nav links */}
+        <nav className={`
+          ${menuOpen ? "flex" : "hidden"}
+          md:flex flex-col md:flex-row absolute md:relative top-full left-0 w-full md:w-auto
+          bg-[#022f42] md:bg-transparent border-t-2 border-[#ffd800] md:border-none
+          py-8 md:py-0 md:pl-8 items-center gap-6 md:gap-8 transition-all shadow-lg md:shadow-none
+        `}>
+          <Link href="/" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
+            Home
+          </Link>
+          <Link href="/#impact" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
+            Impact
+          </Link>
+          <Link href="/#cases" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
+            Case Studies
+          </Link>
+          <Link href="/academy" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1 flex items-center gap-1">
+            Academy <span className="bg-[#ffd800] text-[#022f42] text-[8px] px-1 py-0.5 rounded-sm ml-1">NEW</span>
+          </Link>
+          <Link href="/methodology" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
+            Methodology
+          </Link>
+
+          <div className="flex items-center gap-4 ml-0 md:ml-4 flex-col md:flex-row mt-4 md:mt-0">
+            {user ? (
+              <>
+                <Link
+                  href={user.role === "investor" ? "/investor/dashboard" : "/dashboard"}
+                  onClick={() => setMenuOpen(false)}
+                  className="bg-[#ffd800] border-2 border-[#ffd800] text-[#022f42] hover:bg-transparent hover:text-[#ffd800] px-6 py-2 font-bold text-sm uppercase tracking-widest transition-all text-center shadow-md"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-transparent border-2 border-[#ffd800] text-[#ffd800] hover:bg-[#ffd800] hover:text-[#022f42] px-6 py-2 font-bold text-sm uppercase tracking-widest transition-all text-center"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/auth/login"
+                onClick={() => setMenuOpen(false)}
+                className="bg-[#ffd800] border-2 border-[#ffd800] text-[#022f42] hover:bg-transparent hover:text-[#ffd800] px-6 py-2 font-bold text-sm uppercase tracking-widest transition-all text-center shadow-md"
+              >
+                FundabilityOS
+              </Link>
+            )}
+          </div>
         </nav>
-
-        {/* CTA + Mobile Toggle */}
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <Link href="/interview" className="btn btn-primary btn-sm desktop-cta">
-            Get Fundability Score
-          </Link>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="mobile-menu-btn"
-            aria-label="Toggle menu"
-            style={{
-              background: "none",
-              border: "none",
-              color: "var(--white)",
-              cursor: "pointer",
-              padding: "0.25rem",
-              display: "none",
-            }}
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
       </div>
-
-      {/* Mobile flyout */}
-      {menuOpen && (
-        <div
-          style={{
-            backgroundColor: "var(--navy)",
-            borderTop: "1px solid var(--yellow-20)",
-            padding: "1.5rem var(--container-px)",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.25rem",
-          }}
-        >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="nav-link"
-              onClick={() => setMenuOpen(false)}
-              style={{ fontSize: "0.85rem" }}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/interview"
-            className="btn btn-primary"
-            onClick={() => setMenuOpen(false)}
-            style={{ alignSelf: "flex-start" }}
-          >
-            Get Fundability Score
-          </Link>
-        </div>
-      )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .desktop-cta { display: none !important; }
-          .mobile-menu-btn { display: flex !important; }
-        }
-      `}</style>
     </header>
   );
 }

@@ -148,6 +148,87 @@ const PRICING = [
   },
 ];
 
+const STARTUP_PRICING = PRICING.filter(p => p.name !== "Investor Pro");
+const INVESTOR_PRICING = PRICING.filter(p => p.name === "Investor Pro");
+
+function PricingTabs() {
+  const [activeTab, setActiveTab] = useState<"startup" | "investor">("startup");
+  const plans = activeTab === "startup" ? STARTUP_PRICING : INVESTOR_PRICING;
+
+  return (
+    <div>
+      {/* Tab buttons */}
+      <div style={{ display: "flex", gap: "0", marginBottom: "2.5rem", border: "1px solid rgba(255,216,0,0.15)", borderRadius: "2px", overflow: "hidden", maxWidth: "320px" }}>
+        {(["startup", "investor"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              flex: 1, padding: "0.75rem 1rem", fontSize: "0.65rem", fontWeight: 900,
+              letterSpacing: "0.15em", textTransform: "uppercase", border: "none", cursor: "pointer",
+              transition: "all 0.2s ease",
+              backgroundColor: activeTab === tab ? "var(--yellow)" : "transparent",
+              color: activeTab === tab ? "var(--navy)" : "rgba(255,255,255,0.45)",
+              fontFamily: "inherit",
+            }}
+          >
+            {tab === "startup" ? "For Startups" : "For Investors"}
+          </button>
+        ))}
+      </div>
+
+      {/* Pricing cards */}
+      <div
+        style={{ display: "grid", gridTemplateColumns: activeTab === "startup" ? "repeat(3, 1fr)" : "1fr", gap: "2rem", alignItems: "start", maxWidth: activeTab === "investor" ? "420px" : "100%" }}
+        className="pricing-grid"
+      >
+        {plans.map((plan) => (
+          <div
+            key={plan.name}
+            className={`pricing-card ${plan.featured ? "pricing-card-featured shadow-2xl scale-[1.02]" : ""}`}
+            style={{ backgroundColor: "var(--navy)", padding: "2.5rem", borderRadius: "0", border: plan.featured ? "3px solid var(--yellow)" : "1px solid rgba(255,216,0,0.1)" }}
+          >
+            <div>
+              <p className="label-mono" style={{ color: "var(--yellow)", marginBottom: "0.75rem", fontSize: "0.65rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.2em" }}>
+                {plan.name}
+              </p>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
+                <span style={{ fontSize: "3rem", fontWeight: 900, color: "var(--white)", lineHeight: 1, letterSpacing: "-0.05em" }}>
+                  {plan.price}
+                </span>
+                {plan.period && (
+                  <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>
+                    {plan.period}
+                  </span>
+                )}
+              </div>
+              <p style={{ fontSize: "0.825rem", color: "rgba(255,255,255,0.45)", marginTop: "0.75rem", lineHeight: 1.6 }}>
+                {plan.desc}
+              </p>
+            </div>
+            <div className="yellow-bar-full" style={{ margin: "2rem 0", height: "1px", backgroundColor: "rgba(255,216,0,0.1)" }} />
+            <ul style={{ display: "flex", flexDirection: "column", gap: "0.9rem", listStyle: "none", padding: 0, margin: 0, marginBottom: "3.5rem" }}>
+              {plan.features.map((f) => (
+                <li key={f} style={{ display: "flex", gap: "0.75rem", fontSize: "0.825rem", color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>
+                  <CheckCircle size={14} style={{ color: "var(--yellow)", flexShrink: 0, marginTop: "2px" }} />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href={plan.href}
+              className={`btn ${plan.featured ? "btn-primary shadow-xl" : "btn-ghost border-white/20 text-white hover:bg-white"}`}
+              style={{ width: "100%", justifyContent: "center", fontSize: "0.65rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.15em" }}
+            >
+              {plan.cta}
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { user } = useAuth();
   const [showAssessment, setShowAssessment] = useState(false);
@@ -252,7 +333,7 @@ export default function HomePage() {
                 <>
                   <div className="animate-fade-in-up">
                     <span className="tag-badge" style={{ letterSpacing: "0.25em" }}>
-                      V4 Institutional Engine • Asia Optimized
+                      BECOME FUNDABLE. FASTER.
                     </span>
                   </div>
 
@@ -283,7 +364,7 @@ export default function HomePage() {
                       <ArrowRight size={16} />
                     </button>
                     <Link href="/upload" className="btn btn-ghost border-white/10 hover:border-white/30 text-white/70 hover:text-white">
-                      <Database className="w-4 h-4 mr-2" /> Neural Deck Upload
+                      <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
                     </Link>
                   </div>
                 </>
@@ -538,46 +619,7 @@ export default function HomePage() {
       </section>
 
 
-      <section className="section-light" id="problem">
-        <div className="container">
-          <div style={{ marginBottom: "3rem" }}>
-            <span className="tag-badge" style={{ backgroundColor: "var(--navy)", color: "var(--yellow)" }}>
-              Market Reality Check
-            </span>
-            <span className="yellow-bar" style={{ backgroundColor: "var(--navy)", opacity: 0.15 }} />
-            <h2 className="heading-section" style={{ color: "var(--navy)" }}>
-              67% of ASEAN fundraises fail
-              <br />due to{" "}
-              <span style={{ color: "var(--yellow)", WebkitTextStroke: "1px var(--navy)", textShadow: "none" }}>
-                preventable gaps.
-              </span>
-            </h2>
-          </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "1.5rem",
-            }}
-            className="bento-grid"
-          >
-            {PROBLEMS.map((p, i) => (
-              <div key={i} className="card-bento-light" style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
-                <span style={{ fontSize: "2rem", fontWeight: 900, color: "var(--yellow)", opacity: 0.3, letterSpacing: "-0.05em" }}>
-                  0{i + 1}
-                </span>
-                <h3 className="heading-card" style={{ color: "var(--navy)", fontSize: "0.95rem" }}>
-                  {p.headline}
-                </h3>
-                <p style={{ fontSize: "0.875rem", color: "rgba(2,47,66,0.6)", lineHeight: 1.7 }}>
-                  {p.sub}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* =============================================
           SECTION 3: HOW IT WORKS (dark navy)
@@ -585,7 +627,7 @@ export default function HomePage() {
       <section className="section-dark" id="how-it-works">
         <div className="container">
           <div style={{ marginBottom: "3.5rem", textAlign: "center" }}>
-            <span className="tag-badge">The Roadmap to Capital</span>
+            <span className="tag-badge">The FundabilityOS Roadmap to Capital</span>
             <span className="yellow-bar" style={{ margin: "1rem auto" }} />
             <h2 className="heading-section">
               From zero to investor-ready
@@ -669,128 +711,18 @@ export default function HomePage() {
             </span>
             <span className="yellow-bar" style={{ margin: "1rem auto", backgroundColor: "var(--navy)", opacity: 0.15 }} />
             <h2 className="heading-section" style={{ color: "var(--navy)" }}>
-              V4 Institutional Pricing
+              FundabilityOS Pricing
             </h2>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "2rem",
-              alignItems: "start",
-            }}
-            className="pricing-grid"
-          >
-            {PRICING.map((plan) => (
-              <div
-                key={plan.name}
-                className={`pricing-card ${plan.featured ? "pricing-card-featured shadow-2xl scale-[1.02]" : ""}`}
-                style={{ backgroundColor: "var(--navy)", padding: "2.5rem", borderRadius: "0", border: plan.featured ? "3px solid var(--yellow)" : "1px solid rgba(255,216,0,0.1)" }}
-              >
-                <div>
-                  <p className="label-mono" style={{ color: "var(--yellow)", marginBottom: "0.75rem", fontSize: "0.65rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.2em" }}>
-                    {plan.name}
-                  </p>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
-                    <span style={{ fontSize: "3rem", fontWeight: 900, color: "var(--white)", lineHeight: 1, letterSpacing: "-0.05em" }}>
-                      {plan.price}
-                    </span>
-                    {plan.period && (
-                      <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)", fontWeight: 700 }}>
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: "0.825rem", color: "rgba(255,255,255,0.45)", marginTop: "0.75rem", lineHeight: 1.6 }}>
-                    {plan.desc}
-                  </p>
-                </div>
-
-                <div className="yellow-bar-full" style={{ margin: "2rem 0", height: "1px", backgroundColor: "rgba(255,216,0,0.1)" }} />
-
-                <ul style={{ display: "flex", flexDirection: "column", gap: "0.9rem", listStyle: "none", padding: 0, margin: 0, marginBottom: "3.5rem" }}>
-                  {plan.features.map((f) => (
-                    <li key={f} style={{ display: "flex", gap: "0.75rem", fontSize: "0.825rem", color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>
-                      <CheckCircle size={14} style={{ color: "var(--yellow)", flexShrink: 0, marginTop: "2px" }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href={plan.href}
-                  className={`btn ${plan.featured ? "btn-primary shadow-xl" : "btn-ghost border-white/20 text-white hover:bg-white hover:text-var(--navy)"}`}
-                  style={{ width: "100%", justifyContent: "center", fontSize: "0.65rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.15em" }}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
-          </div>
+          <PricingTabs />
         </div>
       </section>
 
       {/* =============================================
           SECTION 5: WHO IT'S FOR (off-white bento)
          ============================================= */}
-      <section className="section-light" id="who">
-        <div className="container">
-          <div style={{ marginBottom: "3rem" }}>
-            <span className="tag-badge" style={{ backgroundColor: "var(--navy)", color: "var(--yellow)" }}>
-              Founder-Led Architecture
-            </span>
-            <span className="yellow-bar" style={{ margin: "1rem 0", backgroundColor: "var(--navy)", opacity: 0.15 }} />
-            <h2 className="heading-section" style={{ color: "var(--navy)" }}>
-              The standard for ASEAN
-              <br />venture readiness.
-            </h2>
-          </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "1.5rem",
-            }}
-            className="who-grid"
-          >
-            {FOR_WHO.map((w, i) => (
-              <div
-                key={i}
-                className="card-bento-light"
-                style={{ display: "flex", flexDirection: "column", gap: "1.25rem", border: "1px solid rgba(2,47,66,0.05)" }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                  <div
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "0",
-                      backgroundColor: "rgba(2,47,66,0.05)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "var(--navy)",
-                    }}
-                  >
-                    {w.icon}
-                  </div>
-                  <span className="tag-badge" style={{ backgroundColor: "var(--navy)", color: "var(--yellow)", fontSize: "0.55rem" }}>
-                    {w.tag}
-                  </span>
-                </div>
-                <h3 className="heading-card" style={{ color: "var(--navy)", fontSize: "0.95rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  {w.headline}
-                </h3>
-                <p style={{ fontSize: "0.875rem", color: "rgba(2,47,66,0.6)", lineHeight: 1.75 }}>
-                  {w.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* =============================================
           SECTION 6: IMPACT SNAPSHOT (dark navy)
@@ -815,20 +747,10 @@ export default function HomePage() {
          ============================================= */}
       <section className="section-light" id="cases">
         <div className="container">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "4rem" }}>
-            <div style={{ maxWidth: "36rem" }}>
-              <span className="tag-badge" style={{ backgroundColor: "var(--navy)", color: "var(--yellow)" }}>
-                Institutional Validation
-              </span>
-              <span className="yellow-bar" style={{ backgroundColor: "var(--navy)", opacity: 0.15 }} />
-              <h2 className="heading-section" style={{ color: "var(--navy)" }}>
-                Accelerating the next 
-                <br />wave of <span style={{ color: "var(--yellow)", WebkitTextStroke: "1px var(--navy)" }}>ASEAN innovators.</span>
-              </h2>
-            </div>
-            <Link href="/auth/login" className="btn btn-ghost-dark btn-sm desktop-cta">
-              View All Case Studies
-            </Link>
+          <div style={{ marginBottom: "4rem" }}>
+            <h2 className="heading-section" style={{ color: "var(--navy)" }}>
+              Case Studies: Innovators we accelerated
+            </h2>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "2rem" }}>
@@ -856,7 +778,7 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(var(--yellow) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
         <div className="container" style={{ maxWidth: "48rem", position: "relative", zIndex: 10 }}>
           <span className="tag-badge" style={{ marginBottom: "2rem", display: "inline-flex" }}>
-            Secure Portal • V4 Neural Engine
+            FundabilityOS
           </span>
           <h2 className="heading-hero" style={{ marginBottom: "2rem", color: "var(--white)" }}>
             Co-create the <br/><span className="text-gradient">future.</span>
@@ -881,7 +803,7 @@ export default function HomePage() {
               <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
             </button>
             <Link href="/upload" className="btn btn-ghost btn-lg px-12 border-white/20 text-white hover:bg-white hover:text-var(--navy)">
-              <Database className="w-4 h-4 mr-2" /> Neural Upload
+              <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
             </Link>
           </div>
         </div>
