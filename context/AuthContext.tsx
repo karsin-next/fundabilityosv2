@@ -10,6 +10,7 @@ interface UserProfile {
   company_name?: string;
   role?: "startup" | "investor" | "admin";
   is_admin?: boolean;
+  fundability_score?: number;
 }
 
 interface AuthContextType {
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           company_name: profile?.company_name,
           role: profile?.role,
           is_admin: profile?.is_admin,
+          fundability_score: profile?.fundability_score,
         });
       } else {
         setUser(null);
