@@ -614,3 +614,33 @@ Import trace for requested module:
 ./app/page.tsx
  ✓ Compiled in 76ms (490 modules)
  ✓ Compiled in 1086ms (1201 modules)
+ ✓ Compiled in 959ms (1201 modules)
+ ⨯ ./app/page.tsx
+Error:   [31mx[0m Expression expected
+     ,-[[36;1;4m/Users/user/Documents/KarSin/NextBlaze/FundabilityOS/app/page.tsx[0m:317:1]
+ [2m314[0m |       >
+ [2m315[0m |         <div className="container">
+ [2m316[0m |           <div
+ [2m317[0m |           <div
+     : [35;1m          ^[0m
+ [2m318[0m |             style={{
+ [2m319[0m |               display: "grid",
+ [2m320[0m |               gridTemplateColumns: scoringResult ? "1fr" : "1fr 1fr",
+     `----
+  [31mx[0m Expected ',', got 'style'
+     ,-[[36;1;4m/Users/user/Documents/KarSin/NextBlaze/FundabilityOS/app/page.tsx[0m:318:1]
+ [2m315[0m |         <div className="container">
+ [2m316[0m |           <div
+ [2m317[0m |           <div
+ [2m318[0m |             style={{
+     : [35;1m            ^^^^^[0m
+ [2m319[0m |               display: "grid",
+ [2m320[0m |               gridTemplateColumns: scoringResult ? "1fr" : "1fr 1fr",
+ [2m321[0m |               gap: "4rem",
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/page.tsx

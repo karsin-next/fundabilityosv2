@@ -39,19 +39,7 @@ export default function Footer() {
           {/* Brand column */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <Link href="/" style={{ textDecoration: "none", display: "inline-block" }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontWeight: 900,
-                  fontSize: "1.35rem",
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
-                  color: "var(--white)",
-                }}
-              >
-                Fundability
-                <span style={{ color: "var(--yellow)" }}>OS</span>
-              </span>
+              <img src="/logo.png" alt="NextBlaze" className="h-10 object-contain brightness-0 invert" />
             </Link>
 
             <p

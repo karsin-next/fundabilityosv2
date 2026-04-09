@@ -314,11 +314,12 @@ export default function HomePage() {
       >
         <div className="container">
           <div
+          <div
             style={{
               display: "grid",
-              gridTemplateColumns: showAssessment ? "1fr" : "1fr 1fr",
+              gridTemplateColumns: scoringResult ? "1fr" : "1fr 1fr",
               gap: "4rem",
-              alignItems: "center",
+              alignItems: scoringResult ? "start" : "center",
               transition: "all 0.5s ease"
             }}
             className="hero-grid"
@@ -328,61 +329,160 @@ export default function HomePage() {
               display: "flex", 
               flexDirection: "column", 
               gap: "2rem", 
-              maxWidth: showAssessment ? "800px" : "100%", 
-              margin: showAssessment ? "0 auto" : "0",
-              textAlign: showAssessment ? "center" : "left"
+              maxWidth: scoringResult ? "800px" : "100%", 
+              margin: scoringResult ? "0 auto" : "0",
+              textAlign: scoringResult ? "center" : "left"
             }}>
-              {!showAssessment ? (
-                <>
-                  <div className="animate-fade-in-up">
-                    <span className="tag-badge" style={{ letterSpacing: "0.25em" }}>
-                      BECOME FUNDABLE. FASTER.
-                    </span>
+              <div className="animate-fade-in-up" style={{ marginTop: "-2rem" }}>
+                <span className="tag-badge" style={{ letterSpacing: "0.25em" }}>
+                  BECOME FUNDABLE. FASTER.
+                </span>
+              </div>
+
+              <h1 className="heading-hero animate-fade-in-up delay-100" style={{ color: "var(--white)" }}>
+                Know Your <br/><span className="text-gradient">Fundability Score</span> <br/>in 10 Minutes.
+              </h1>
+
+              <p
+                className="animate-fade-in-up delay-200 font-sans"
+                style={{
+                  fontSize: "1.125rem",
+                  color: "rgba(255,255,255,0.6)",
+                  lineHeight: 1.8,
+                  maxWidth: "34rem",
+                  fontWeight: 500,
+                  margin: scoringResult ? "0 auto" : "0"
+                }}
+              >
+                Answer AI questions or upload your pitch deck. Get a score (0–100) that shows exactly
+                where you stand — and what investors will push back on before you pitch.
+              </p>
+
+              {!showAssessment && (
+                <div
+                  className="animate-fade-in-up delay-300"
+                  style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap", alignItems: "center", marginTop: "1rem", justifyContent: scoringResult ? "center" : "flex-start" }}
+                >
+                  <button onClick={() => setShowAssessment(true)} className="btn btn-primary btn-lg shadow-[0_20px_40px_-10px_rgba(255,216,0,0.3)]">
+                    Start Diagnostic — It&apos;s Free
+                    <ArrowRight size={16} />
+                  </button>
+                  <Link href="/upload" className="btn btn-ghost border-white/10 hover:border-white/30 text-white/70 hover:text-white">
+                    <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
+                  </Link>
+                </div>
+              )}
+
+              {/* Verified Proof Banner */}
+              <div
+                className="animate-fade-in-up delay-400"
+                style={{
+                  display: "flex",
+                  gap: "2.5rem",
+                  paddingTop: "2.5rem",
+                  flexWrap: "wrap",
+                  justifyContent: scoringResult ? "center" : "flex-start",
+                  borderTop: showAssessment ? "1px solid rgba(255,255,255,0.05)" : "none",
+                  marginTop: showAssessment ? "3rem" : "0"
+                }}
+              >
+                {!showAssessment ? (
+                   [
+                    { value: "2,400+", label: "Founders Assessed" },
+                    { value: "12", label: "Markets Covered" },
+                    { value: "8", label: "Investor Dimensions" },
+                  ].map((m) => (
+                    <div key={m.label} style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+                      <span style={{ fontSize: "1.5rem", fontWeight: 900, color: "var(--yellow)" }}>
+                        {m.value}
+                      </span>
+                      <span className="label-metric">{m.label}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center gap-12 justify-center flex-wrap">
+                     <div className="flex items-center gap-3">
+                        <Shield className="w-5 h-5 text-var(--yellow)" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-50/50">V4 Neural Engine</span>
+                     </div>
+                     <div className="flex items-center gap-3">
+                        <Globe className="w-5 h-5 text-var(--yellow)" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-50/50">Real-time Benchmarking</span>
+                     </div>
+                     <div className="flex items-center gap-3">
+                        <Lock className="w-5 h-5 text-var(--yellow)" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-50/50">Institutional Integrity</span>
+                     </div>
                   </div>
+                )}
+              </div>
+            </div>
 
-                  <h1 className="heading-hero animate-fade-in-up delay-100" style={{ color: "var(--white)" }}>
-                    Know Your <br/><span className="text-gradient">Fundability Score</span> <br/>in 10 Minutes.
-                  </h1>
-
-                  <p
-                    className="animate-fade-in-up delay-200"
-                    style={{
-                      fontSize: "1.125rem",
-                      color: "rgba(255,255,255,0.6)",
-                      lineHeight: 1.8,
-                      maxWidth: "34rem",
-                      fontWeight: 500
-                    }}
-                  >
-                    Answer AI questions or upload your pitch deck. Get a score (0–100) that shows exactly
-                    where you stand — and what investors will push back on before you pitch.
-                  </p>
-
+            {/* Right / Bottom Content */}
+            <div className={scoringResult ? "w-full" : "hero-right w-full"} style={{ animation: "fadeInAssessment 0.6s ease" }}>
+              
+              {!showAssessment && (
+                <div className="animate-fade-in delay-200" style={{ display: "flex", justifyContent: "center" }}>
                   <div
-                    className="animate-fade-in-up delay-300"
-                    style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap", alignItems: "center", marginTop: "1rem" }}
+                    style={{
+                      border: "2px solid var(--yellow-20)",
+                      borderRadius: "4px",
+                      padding: "3rem",
+                      background: "rgba(255,255,255,0.02)",
+                      backdropFilter: "blur(12px)",
+                      width: "100%",
+                      maxWidth: "400px",
+                      position: "relative",
+                    }}
+                    className="shadow-2xl"
                   >
-                    <button onClick={() => setShowAssessment(true)} className="btn btn-primary btn-lg shadow-[0_20px_40px_-10px_rgba(255,216,0,0.3)]">
-                      Start Diagnostic — It&apos;s Free
-                      <ArrowRight size={16} />
-                    </button>
-                    <Link href="/upload" className="btn btn-ghost border-white/10 hover:border-white/30 text-white/70 hover:text-white">
-                      <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
-                    </Link>
+                    <div style={{ position: "absolute", top: 0, left: 0, width: "4rem", height: "4px", backgroundColor: "var(--yellow)" }} />
+                    <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+                      <span className="tag-badge" style={{ marginBottom: "1rem", backgroundColor: "var(--yellow)", color: "var(--navy)" }}>Institutional Fragment</span>
+                    </div>
+                    <ScoreGaugeMock score={74} band="Investor-Ready" />
+                    <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                      {[
+                        { label: "Product Readiness", score: 14, max: 15, color: "var(--green)" },
+                        { label: "Revenue Model", score: 8, max: 20, color: "var(--amber)" },
+                        { label: "Problem Severity", score: 12, max: 15, color: "var(--green)" },
+                      ].map((dim) => (
+                        <div key={dim.label}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                            <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", letterSpacing: "0.15em", textTransform: "uppercase" }}>{dim.label}</span>
+                            <span style={{ fontSize: "0.7rem", fontWeight: 900, color: dim.color }}>{dim.score}/{dim.max}</span>
+                          </div>
+                          <div className="dimension-bar-track" style={{ height: "4px", background: "rgba(255,255,255,0.05)" }}>
+                            <div className="dimension-bar-fill" style={{ width: `${(dim.score / dim.max) * 100}%`, backgroundColor: dim.color, height: "100%" }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: "2.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,216,0,0.1)" }}>
+                      <button onClick={() => setShowAssessment(true)} className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>Get Verified Score</button>
+                    </div>
                   </div>
-                </>
-              ) : (
-                <div style={{ width: "100%", animation: "fadeInAssessment 0.6s ease" }}>
-                  <div className="animate-fade-in-up" style={{ marginBottom: "1.5rem" }}>
-                    <span className="tag-badge" style={{ backgroundColor: "var(--yellow)", color: "var(--navy)" }}>
-                      Live Neural Session
-                    </span>
-                  </div>
-                  <h2 className="heading-hero" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "var(--white)", marginBottom: "3rem" }}>
-                    {scoringResult ? "Analysis Complete" : "Evaluating Venture..."}
-                  </h2>
+                </div>
+              )}
 
-                  {scoringResult ? (
+              {showAssessment && !scoringResult && (
+                <div style={{ position: "relative", width: "100%", maxWidth: "600px", margin: "0 auto", background: "rgba(255, 255, 255, 0.05)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", padding: "2rem", backdropFilter: "blur(12px)" }}>
+                  <div style={{ position: "absolute", top: "1rem", right: "1rem", zIndex: 10 }}>
+                    <button 
+                      onClick={() => setShowAssessment(false)} 
+                      className="text-white/50 hover:text-white"
+                      title="Cancel Assessment"
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                  <div className="font-sans text-[0.95rem] tracking-normal">
+                    <QuickAssess isEmbedded={true} onComplete={handleComplete} />
+                  </div>
+                </div>
+              )}
+
+              {scoringResult && (
                     <div className="results-dashboard animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Score Card */}
@@ -418,101 +518,8 @@ export default function HomePage() {
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <QuickAssess isEmbedded={true} onComplete={handleComplete} />
                   )}
-                </div>
-              )}
-
-              {/* Verified Proof Banner */}
-              <div
-                className="animate-fade-in-up delay-400"
-                style={{
-                  display: "flex",
-                  gap: "2.5rem",
-                  paddingTop: "2.5rem",
-                  flexWrap: "wrap",
-                  justifyContent: showAssessment ? "center" : "flex-start",
-                  borderTop: showAssessment ? "1px solid rgba(255,255,255,0.05)" : "none",
-                  marginTop: showAssessment ? "3rem" : "0"
-                }}
-              >
-                {!showAssessment ? (
-                   [
-                    { value: "2,400+", label: "Founders Assessed" },
-                    { value: "12", label: "Markets Covered" },
-                    { value: "8", label: "Investor Dimensions" },
-                  ].map((m) => (
-                    <div key={m.label} style={{ display: "flex", flexDirection: "column", gap: "0.1rem" }}>
-                      <span style={{ fontSize: "1.5rem", fontWeight: 900, color: "var(--yellow)" }}>
-                        {m.value}
-                      </span>
-                      <span className="label-metric">{m.label}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex items-center gap-12">
-                     <div className="flex items-center gap-3">
-                        <Shield className="w-5 h-5 text-var(--yellow)" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-50/50">V4 Neural Engine</span>
-                     </div>
-                     <div className="flex items-center gap-3">
-                        <Globe className="w-5 h-5 text-var(--yellow)" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-50/50">Real-time Benchmarking</span>
-                     </div>
-                     <div className="flex items-center gap-3">
-                        <Lock className="w-5 h-5 text-var(--yellow)" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-50/50">Institutional Integrity</span>
-                     </div>
-                  </div>
-                )}
-              </div>
             </div>
-
-            {/* Right — Score Gauge Demo (Hidden during assessment) */}
-            {!showAssessment && (
-              <div className="animate-fade-in delay-200 hero-right" style={{ display: "flex", justifyContent: "center" }}>
-                <div
-                  style={{
-                    border: "2px solid var(--yellow-20)",
-                    borderRadius: "4px",
-                    padding: "3rem",
-                    background: "rgba(255,255,255,0.02)",
-                    backdropFilter: "blur(12px)",
-                    width: "100%",
-                    maxWidth: "400px",
-                    position: "relative",
-                  }}
-                  className="shadow-2xl"
-                >
-                  <div style={{ position: "absolute", top: 0, left: 0, width: "4rem", height: "4px", backgroundColor: "var(--yellow)" }} />
-                  <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-                    <span className="tag-badge" style={{ marginBottom: "1rem", backgroundColor: "var(--yellow)", color: "var(--navy)" }}>Institutional Fragment</span>
-                  </div>
-                  <ScoreGaugeMock score={74} band="Investor-Ready" />
-                  <div style={{ marginTop: "2rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {[
-                      { label: "Product Readiness", score: 14, max: 15, color: "var(--green)" },
-                      { label: "Revenue Model", score: 8, max: 20, color: "var(--amber)" },
-                      { label: "Problem Severity", score: 12, max: 15, color: "var(--green)" },
-                    ].map((dim) => (
-                      <div key={dim.label}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                          <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "rgba(255,255,255,0.4)", letterSpacing: "0.15em", textTransform: "uppercase" }}>{dim.label}</span>
-                          <span style={{ fontSize: "0.7rem", fontWeight: 900, color: dim.color }}>{dim.score}/{dim.max}</span>
-                        </div>
-                        <div className="dimension-bar-track" style={{ height: "4px", background: "rgba(255,255,255,0.05)" }}>
-                          <div className="dimension-bar-fill" style={{ width: `${(dim.score / dim.max) * 100}%`, backgroundColor: dim.color, height: "100%" }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ marginTop: "2.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,216,0,0.1)" }}>
-                    <button onClick={() => setShowAssessment(true)} className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>Get Verified Score</button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -594,7 +601,7 @@ export default function HomePage() {
       {/* =============================================
           SECTION: CASE STUDIES
          ============================================= */}
-      <section className="bg-[#ffd800]">
+      <section className="bg-[#ffd800] pb-24">
         <div className="max-w-[1280px] mx-auto px-6 py-12 border-t border-[#022f42]/5">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
             <div className="max-w-2xl">
@@ -730,46 +737,7 @@ export default function HomePage() {
 
 
 
-      {/* =============================================
-          SECTION 8: CTA CLOSE (dark navy)
-         ============================================= */}
-      <section
-        className="section-dark"
-        style={{ textAlign: "center", paddingBlock: "clamp(6rem, 12vw, 10rem)", position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,216,0,0.1)" }}
-      >
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(var(--yellow) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
-        <div className="container" style={{ maxWidth: "48rem", position: "relative", zIndex: 10 }}>
-          <span className="tag-badge border-none p-0 inline-flex" style={{ marginBottom: "2rem" }}>
-            <img src="/logo.png" alt="NextBlaze" className="h-14 object-contain brightness-0 invert" />
-          </span>
-          <h2 className="heading-hero" style={{ marginBottom: "2rem", color: "var(--white)" }}>
-            Co-create the <br/><span className="text-gradient">future.</span>
-          </h2>
-          <p
-            style={{
-              fontSize: "1.125rem",
-              color: "rgba(255,255,255,0.45)",
-              lineHeight: 1.8,
-              marginBottom: "3.5rem",
-              maxWidth: "36rem",
-              marginInline: "auto",
-              fontWeight: 500,
-            }}
-          >
-            We bridge innovators with markets, funding, and partners across Asia. 
-            Initialize your fundability sequence today.
-          </p>
-          <div style={{ display: "flex", gap: "1.5rem", justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={() => { setShowAssessment(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="btn btn-primary btn-lg px-12 group">
-              Start Your Assessment
-              <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <Link href="/upload" className="btn btn-ghost btn-lg px-12 border-white/20 text-white hover:bg-white hover:text-var(--navy)">
-              <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
-            </Link>
-          </div>
-        </div>
-      </section>
+
 
       <style>{`
         @media (max-width: 900px) {
