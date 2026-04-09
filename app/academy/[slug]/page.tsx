@@ -87,9 +87,12 @@ const ACADEMY_DB: Record<string, any> = {
   }
 };
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
+import { use } from "react";
+
+export default function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { user } = useAuth();
-  const article = ACADEMY_DB[params.slug];
+  const resolvedParams = use(params);
+  const article = ACADEMY_DB[resolvedParams.slug];
 
   if (!article) {
     return (
