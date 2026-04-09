@@ -9,7 +9,19 @@ import { createClient } from "@/lib/supabase/client";
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/dashboard";
+  const supabase = createClient();
+
+  const getRedirectByRole = async (): Promise<string> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return "/dashboard";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role === "investor") return "/investor/dashboard";
+    return "/dashboard";
+  };
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +44,8 @@ function LoginContent() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push(redirectTo);
+      const dest = await getRedirectByRole();
+      router.push(dest);
       router.refresh();
     }
   }

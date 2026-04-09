@@ -27,6 +27,7 @@ interface Props {
 }
 
 export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
+  const MAX_QUESTIONS = 20;
   const [state, setState] = useState<InterviewState>("idle");
   const padding = isEmbedded ? "0" : "2.5rem"; // Use variable to satisfy ESLint
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -165,14 +166,22 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
   const handleSelectOption = (value: string) => {
     const newHistory = [...history, { question: activeQuestion!.title, answer: value }];
     setHistory(newHistory);
-    fetchNextNode(newHistory);
+    if (newHistory.length >= MAX_QUESTIONS) {
+      runScoring(Object.fromEntries(newHistory.map(h => [h.question, h.answer])));
+    } else {
+      fetchNextNode(newHistory);
+    }
   };
 
   const handleCustomSubmit = () => {
     if (!customInput.trim()) return;
     const newHistory = [...history, { question: activeQuestion!.title, answer: customInput.trim() }];
     setHistory(newHistory);
-    fetchNextNode(newHistory);
+    if (newHistory.length >= MAX_QUESTIONS) {
+      runScoring(Object.fromEntries(newHistory.map(h => [h.question, h.answer])));
+    } else {
+      fetchNextNode(newHistory);
+    }
   };
 
   const handleReset = () => {

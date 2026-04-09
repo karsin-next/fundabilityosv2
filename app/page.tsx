@@ -445,8 +445,99 @@ export default function HomePage() {
       </section>
 
       {/* =============================================
-          SECTION 2: PROBLEM (off-white bento)
+          SECTION: 100% FREE FOR EARLY ADOPTERS
          ============================================= */}
+      <section className="max-w-[1280px] mx-auto px-6 py-20">
+        <div className="bg-white shadow-[0_45px_100px_-20px_rgba(2,47,66,0.1)] flex flex-col md:flex-row overflow-hidden border-b-[8px] border-[#ffd800]">
+          <div className="bg-[#022f42] text-white p-12 md:w-2/5 flex flex-col justify-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Sparkles size={120} />
+            </div>
+            <div className="inline-block px-4 py-1.5 bg-[#ffd800] text-[#022f42] text-[10px] font-black uppercase tracking-widest mb-8 self-start shadow-sm">
+              100% Free for Early Adopters
+            </div>
+            <h2 className="text-4xl font-black uppercase tracking-tighter mb-6 leading-none">What does FundabilityOS do?</h2>
+            <p className="text-[#b0d0e0] leading-relaxed mb-10 font-medium">
+              FundabilityOS QuickAssess (QA) is a continuous diagnostic engine. It bridges the fatal gap between scaling startups and institutional investors by providing a dual-sided ecosystem.
+            </p>
+            <Link href="/methodology" className="flex items-center text-[#ffd800] font-black uppercase tracking-widest text-[10px] hover:translate-x-2 transition-transform">
+              View our methodology <ArrowRight className="w-4 h-4 ml-3" />
+            </Link>
+          </div>
+          <div className="p-12 md:w-3/5 grid grid-cols-1 sm:grid-cols-2 gap-12">
+            <div className="space-y-6">
+              <div className="w-14 h-14 bg-[#f2f6fa] rounded-sm flex items-center justify-center border-2 border-[#022f42]/5 shadow-sm">
+                <Sparkles className="w-7 h-7 text-[#022f42]" />
+              </div>
+              <h4 className="text-2xl font-black text-[#022f42] uppercase tracking-tighter">For Startups</h4>
+              <p className="text-[#1e4a62] text-sm leading-relaxed font-medium">
+                Stop guessing what investors want. Compute your exact fundraising readiness score instantly, track your live burn rate, and access a tailored curriculum to fix tactical gaps before you pitch.
+              </p>
+            </div>
+            <div className="space-y-6">
+              <div className="w-14 h-14 bg-[#f2f6fa] rounded-sm flex items-center justify-center border-2 border-[#022f42]/5 shadow-sm">
+                <Shield className="w-7 h-7 text-[#022f42]" />
+              </div>
+              <h4 className="text-2xl font-black text-[#022f42] uppercase tracking-tighter">For Investors</h4>
+              <p className="text-[#1e4a62] text-sm leading-relaxed font-medium">
+                Access an exclusive, highly-curated deal flow pipeline. Every startup on our platform is pre-vetted with certified MRR, runway verifications, and cap table integrity algorithms.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =============================================
+          SECTION: IMPACT SNAPSHOT
+         ============================================= */}
+      <section className="max-w-[1280px] mx-auto px-6 py-10">
+        <h2 className="text-5xl font-black text-[#022f42] mb-12 uppercase tracking-tighter flex items-center gap-6">
+          Impact Snapshot
+          <div className="h-2 w-24 bg-[#ffd800]" />
+        </h2>
+        <div className="flex flex-wrap gap-12 bg-white p-12 shadow-[0_45px_100px_-20px_rgba(2,47,66,0.1)] border-t-[8px] border-[#022f42]">
+          {IMPACT_METRICS.map((stat, i) => (
+            <div key={i} className="flex-1 min-w-[180px]">
+              <div className="text-4xl md:text-5xl font-black text-[#022f42] leading-none mb-4 tracking-tighter">{stat.value}</div>
+              <div className="text-[#1e4a62] text-[10px] uppercase tracking-[0.2em] font-black">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* =============================================
+          SECTION: CASE STUDIES
+         ============================================= */}
+      <section className="max-w-[1280px] mx-auto px-6 py-20 border-t border-[#022f42]/5">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+          <div className="max-w-2xl">
+            <h2 className="text-5xl font-black text-[#022f42] uppercase tracking-tighter mb-6">Case Studies: <br/> Innovators we accelerated</h2>
+            <p className="text-lg text-[#1e4a62] font-medium leading-relaxed">
+              Real stories from deep tech founders across Asia validating their business models through our system.
+            </p>
+          </div>
+          <Link href="/auth/login" className="px-8 py-4 border-2 border-[#022f42]/10 font-black uppercase text-[10px] tracking-widest hover:border-[#ffd800] transition-colors shrink-0">
+            View All Case Studies
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {CASE_STUDIES.map((item, i) => (
+            <div
+              key={i}
+              className="bg-white p-10 shadow-[0_45px_100px_-20px_rgba(2,47,66,0.1)] border-b-4 border-transparent hover:border-[#ffd800] transition-all flex flex-col group hover:-translate-y-2 duration-300"
+            >
+              <div className="text-[10px] uppercase tracking-[0.25em] text-[#ffd800] font-black mb-6">{item.tag}</div>
+              <h4 className="text-2xl font-black text-[#022f42] mb-6 uppercase tracking-tighter leading-none group-hover:text-[#ffd800] transition-colors">{item.title}</h4>
+              <p className="text-[#1e4a62] text-sm leading-relaxed mb-8 flex-grow font-medium">{item.desc}</p>
+              <div className="font-black text-[9px] text-[#022f42]/30 uppercase tracking-[0.2em] border-t border-[rgba(2,47,66,0.05)] pt-6">
+                {item.meta}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
       <section className="section-light" id="problem">
         <div className="container">
           <div style={{ marginBottom: "3rem" }}>

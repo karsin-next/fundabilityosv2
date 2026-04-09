@@ -556,3 +556,7 @@ Import trace for requested module:
  ✓ Compiled in 161ms (489 modules)
  ✓ Compiled in 339ms (489 modules)
  ✓ Compiled in 321ms (489 modules)
+ ✓ Compiled in 4.1s (1172 modules)
+ ✓ Compiled in 1061ms (1172 modules)
+ ✓ Compiled in 447ms (1172 modules)
+ ✓ Compiled in 277ms (489 modules)
