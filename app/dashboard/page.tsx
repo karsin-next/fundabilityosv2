@@ -171,8 +171,9 @@ export default function AuditHubPage() {
              </>
            ) : (
              <div className="flex flex-col items-center">
-                <div className="w-20 h-20 border-4 border-[#022f42]/5 border-t-[#ffd800] rounded-full animate-spin mb-6" />
-                <div className="text-[10px] font-black uppercase tracking-widest text-[#022f42]">Waiting for First Audit...</div>
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#022f42]/40 mb-4">Global Health Score</div>
+                <div className="text-8xl font-black text-[#022f42]/20 tracking-tighter leading-none mb-4">--</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-[#022f42]/60">Waiting for First Audit</div>
              </div>
            )}
         </div>

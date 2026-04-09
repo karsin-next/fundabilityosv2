@@ -233,7 +233,7 @@ const siteMap: NavSection[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const isActive = (href: string) => pathname === href;
@@ -266,10 +266,10 @@ export function DashboardSidebar() {
                 {(user?.company_name || user?.full_name || "S").charAt(0).toUpperCase()}
               </div>
               <h2 className="text-sm font-bold text-white leading-tight truncate">
-                {user?.company_name || "Unregistered Startup"}
+                {user?.company_name || user?.full_name || "FundabilityOS User"}
               </h2>
               <p className="text-[10px] text-[#b0d0e0] font-medium mt-0.5 truncate">
-                {user?.full_name || "Founder"}
+                {user?.company_name ? (user?.full_name || "Founder") : "Founder"}
               </p>
               {user?.email && (
                 <p className="text-[9px] text-white/70 truncate leading-tight mt-2 bg-black/20 px-1.5 py-0.5 rounded-sm">
@@ -378,6 +378,19 @@ export function DashboardSidebar() {
             );
           })}
         </nav>
+      </div>
+
+      {/* Logout Button */}
+      <div className="mt-auto p-4 border-t border-[#1b4f68]/50">
+        <button 
+          onClick={async () => {
+            await signOut();
+            window.location.href = '/auth/login';
+          }} 
+          className="w-full bg-[#1b4f68]/20 hover:bg-red-500/10 hover:text-red-400 text-white/50 transition-colors border border-white/5 rounded-sm py-2.5 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+        >
+          Logout Secure Session
+        </button>
       </div>
     </aside>
   );

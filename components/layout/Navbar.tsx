@@ -14,8 +14,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const supabase = createClient();
 
-  // Hide Navbar on dashboard/app routes that have their own sidebar nav
-  const hideNavRoutes = ["/dashboard", "/interview", "/upload", "/checkout", "/investor/dashboard"];
+  // Hide Navbar only on deep interview/checkout flows, keep it on dashboard for global navigation
+  const hideNavRoutes = ["/interview", "/upload", "/checkout"];
   const shouldHide = hideNavRoutes.some((route) => pathname?.startsWith(route));
   if (shouldHide) return null;
 
