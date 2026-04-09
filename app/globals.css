@@ -24,7 +24,12 @@
   /* Spacing */
   --section-py: clamp(4rem, 8vw, 7rem);
   --container-px: clamp(1.25rem, 5vw, 4rem);
-  --max-width: 1280px;
+  --max-width: 1440px;
+  
+  /* Premium Shadow & Blur */
+  --glass-bg: rgba(2, 47, 66, 0.45);
+  --glass-border: rgba(255, 216, 0, 0.12);
+  --glass-blur: blur(16px);
 }
 
 /* ============================================================
@@ -38,9 +43,12 @@ html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-sans);
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: 1.6;
   color: var(--white);
   background-color: var(--navy);
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,216,0,0.02) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255,216,0,0.01) 0%, transparent 40%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -73,10 +81,10 @@ body {
    ============================================================ */
 
 .heading-hero {
-  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
   font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
   text-transform: uppercase;
 }
 
@@ -399,6 +407,23 @@ body {
   user-select: none;
   pointer-events: none;
   position: relative;
+}
+
+/* ============================================================
+   GLASSMORPHISM & PREMIUM EFFECTS
+   ============================================================ */
+.glass-premium {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 25px 50px -12px rgba(2, 47, 66, 0.5);
+}
+
+.text-gradient {
+  background: linear-gradient(to bottom right, var(--white) 30%, var(--yellow) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .lock-overlay {

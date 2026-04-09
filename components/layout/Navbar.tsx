@@ -23,6 +23,12 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Hide Navbar on specific app pages that need 100vh / dedicated sidebar
+  const hideNavRoutes = ["/dashboard", "/interview", "/upload", "/checkout"];
+  const shouldHide = hideNavRoutes.some((route) => pathname?.startsWith(route));
+
+  if (shouldHide) return null;
+
   return (
     <header
       style={{

@@ -6,10 +6,11 @@
 export type ScoreBand = "Pre-Ready" | "Early-Stage" | "Investor-Ready" | "Top 10%";
 export type SessionStatus = "in_progress" | "completed" | "abandoned";
 export type InputMethod = "interview" | "deck_upload" | "hybrid";
-export type PaymentType = "report" | "badge_monthly" | "badge_annual" | "addon";
+export type PaymentType = "report" | "startup_pro" | "startup_scale" | "investor_basic" | "investor_pro" | "addon";
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
 export type SubStatus = "active" | "past_due" | "canceled" | "trialing" | "incomplete";
-export type PlanType = "monthly" | "annual";
+export type PlanType = "free" | "startup_pro" | "startup_scale" | "investor_basic" | "investor_pro";
+export type UserRole = "startup" | "investor" | "admin";
 export type AddonType = "deck_analyzer" | "cap_table" | "projections" | "intro_letter" | "data_room";
 
 export interface ComponentScores {
@@ -49,6 +50,7 @@ export interface Database {
           email: string | null;
           full_name: string | null;
           company_name: string | null;
+          role: UserRole;
           is_admin: boolean;
           referral_code: string | null;
           referred_by: string | null;
@@ -274,6 +276,59 @@ export interface Database {
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["audit_log"]["Row"], "id" | "created_at">;
+        Update: never;
+      };
+
+      integrations: {
+        Row: {
+          id: string;
+          user_id: string;
+          platform: string;
+          status: string;
+          last_sync_at: string;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["integrations"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["integrations"]["Insert"]>;
+      };
+
+      evaluations: {
+        Row: {
+          id: string;
+          investor_id: string;
+          startup_id: string;
+          decision: string;
+          reason_code: string | null;
+          feedback_msg: string | null;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["evaluations"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["evaluations"]["Insert"]>;
+      };
+
+      chats: {
+        Row: {
+          id: string;
+          startup_id: string;
+          investor_id: string;
+          status: string;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["chats"]["Row"], "id" | "created_at">;
+        Update: Partial<Database["public"]["Tables"]["chats"]["Insert"]>;
+      };
+
+      chat_messages: {
+        Row: {
+          id: string;
+          chat_id: string;
+          sender_id: string;
+          content: string;
+          is_read: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["chat_messages"]["Row"], "id" | "created_at">;
         Update: never;
       };
     };
