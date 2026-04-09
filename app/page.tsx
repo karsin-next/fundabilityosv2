@@ -314,7 +314,6 @@ export default function HomePage() {
       >
         <div className="container">
           <div
-          <div
             style={{
               display: "grid",
               gridTemplateColumns: scoringResult ? "1fr" : "1fr 1fr",
