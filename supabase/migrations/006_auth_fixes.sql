@@ -9,8 +9,8 @@ DECLARE
   new_referral_code TEXT;
   referrer_uuid UUID := NULL;
 BEGIN
-  -- Generate unique 8-char referral code
-  new_referral_code := upper(substring(encode(gen_random_bytes(6), 'hex') FROM 1 FOR 8));
+  -- Generate unique 8-char referral code using fully native PG functions (no pgcrypto search_path dependency)
+  new_referral_code := upper(substring(replace(gen_random_uuid()::text, '-', '') FROM 1 FOR 8));
 
   -- Safely extract metadata
   IF NEW.raw_user_meta_data IS NOT NULL THEN
