@@ -80,6 +80,9 @@ const CASE_STUDIES = [
   { tag: "Robotics / F&B", title: "AI-powered Robotic Barista", desc: "Autonomous robot ecosystem serving 200 cups/hour. Deployed in transport hubs across 6 countries.", meta: "RM 350M VALUATION • 6 COUNTRIES" },
   { tag: "IoT / Logistics", title: "AI-driven fleet telematics", desc: "Comprehensive management platform combining GPS, IoT sensors. Collected 2.6B data points for optimization.", meta: "2.6B DATA POINTS • ASEAN SCALE" },
   { tag: "Web3 / Network", title: "Bandwidth sharing network", desc: "App allowing users to share unused WiFi, creating affordable access. 85,000 hotspots worldwide.", meta: "85,000 HOTSPOTS • GLOBAL" },
+  { tag: "HealthTech / Dx", title: "Point-of-care diagnostics", desc: "Portable rapid testing platform for infectious diseases delivering lab-grade results in 15 minutes at rural clinics.", meta: "15-MIN RESULTS • RURAL IMPACT" },
+  { tag: "CleanTech / Solar", title: "Micro-grid solar distribution", desc: "Pay-as-you-go solar micro-grids powering off-grid communities. IoT-monitored distribution across 4 provinces.", meta: "4 PROVINCES • IoT MONITORED" },
+  { tag: "FinTech / Shariah", title: "Ethical micro-lending", desc: "Digital platform enabling ethical financing for underbanked SMEs with AI credit scoring. Shariah-compliant.", meta: "AI CREDIT SCORING • SME FOCUS" }
 ];
 
 const PRICING = [
@@ -185,7 +188,7 @@ function PricingTabs() {
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`pricing-card ${plan.featured ? "pricing-card-featured shadow-2xl scale-[1.02]" : ""}`}
+            className={`pricing-card flex flex-col h-full ${plan.featured ? "pricing-card-featured shadow-2xl scale-[1.02]" : ""}`}
             style={{ backgroundColor: "var(--navy)", padding: "2.5rem", borderRadius: "0", border: plan.featured ? "3px solid var(--yellow)" : "1px solid rgba(255,216,0,0.1)" }}
           >
             <div>
@@ -217,7 +220,7 @@ function PricingTabs() {
             </ul>
             <Link
               href={plan.href}
-              className={`btn ${plan.featured ? "btn-primary shadow-xl" : "btn-ghost border-white/20 text-white hover:bg-white"}`}
+              className={`btn mt-auto ${plan.featured ? "btn-primary shadow-xl" : "btn-ghost border-white/20 text-white hover:bg-white hover:text-var(--navy)"}`}
               style={{ width: "100%", justifyContent: "center", fontSize: "0.65rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.15em" }}
             >
               {plan.cta}
@@ -528,7 +531,8 @@ export default function HomePage() {
       {/* =============================================
           SECTION: 100% FREE FOR EARLY ADOPTERS
          ============================================= */}
-      <section className="max-w-[1280px] mx-auto px-6 py-20">
+      <section className="bg-white">
+        <div className="max-w-[1280px] mx-auto px-6 py-12">
         <div className="bg-white shadow-[0_45px_100px_-20px_rgba(2,47,66,0.1)] flex flex-col md:flex-row overflow-hidden border-b-[8px] border-[#ffd800]">
           <div className="bg-[#022f42] text-white p-12 md:w-2/5 flex flex-col justify-center relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-5">
@@ -571,8 +575,8 @@ export default function HomePage() {
       {/* =============================================
           SECTION: IMPACT SNAPSHOT
          ============================================= */}
-      <section className="max-w-[1280px] mx-auto px-6 py-10">
-        <h2 className="text-5xl font-black text-[#022f42] mb-12 uppercase tracking-tighter flex items-center gap-6">
+      <section className="max-w-[1280px] mx-auto px-6 py-12">
+        <h2 className="text-5xl font-black text-[#ffd800] mb-8 uppercase tracking-tighter flex items-center gap-6">
           Impact Snapshot
           <div className="h-2 w-24 bg-[#ffd800]" />
         </h2>
@@ -589,18 +593,17 @@ export default function HomePage() {
       {/* =============================================
           SECTION: CASE STUDIES
          ============================================= */}
-      <section className="max-w-[1280px] mx-auto px-6 py-20 border-t border-[#022f42]/5">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-          <div className="max-w-2xl">
-            <h2 className="text-5xl font-black text-[#022f42] uppercase tracking-tighter mb-6">Case Studies: <br/> Innovators we accelerated</h2>
+      <section className="bg-[#ffd800]">
+        <div className="max-w-[1280px] mx-auto px-6 py-12 border-t border-[#022f42]/5">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
+            <div className="max-w-2xl">
+              <h2 className="text-5xl font-black text-[#022f42] uppercase tracking-tighter mb-6">Case Studies: <br/> Innovators we accelerated</h2>
             <p className="text-lg text-[#1e4a62] font-medium leading-relaxed">
               Real stories from deep tech founders across Asia validating their business models through our system.
             </p>
           </div>
-          <Link href="/auth/login" className="px-8 py-4 border-2 border-[#022f42]/10 font-black uppercase text-[10px] tracking-widest hover:border-[#ffd800] transition-colors shrink-0">
-            View All Case Studies
-          </Link>
-        </div>
+            </div>
+          </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {CASE_STUDIES.map((item, i) => (
             <div
@@ -624,9 +627,9 @@ export default function HomePage() {
       {/* =============================================
           SECTION 3: HOW IT WORKS (dark navy)
          ============================================= */}
-      <section className="section-dark" id="how-it-works">
+      <section className="section-dark py-12" id="how-it-works">
         <div className="container">
-          <div style={{ marginBottom: "3.5rem", textAlign: "center" }}>
+          <div style={{ marginBottom: "2.5rem", textAlign: "center" }}>
             <span className="tag-badge">The FundabilityOS Roadmap to Capital</span>
             <span className="yellow-bar" style={{ margin: "1rem auto" }} />
             <h2 className="heading-section">
@@ -703,9 +706,9 @@ export default function HomePage() {
       {/* =============================================
           SECTION 4: PRICING (off-white)
          ============================================= */}
-      <section className="section-light" id="pricing">
+      <section className="section-light py-12" id="pricing">
         <div className="container">
-          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+          <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
             <span className="tag-badge" style={{ backgroundColor: "var(--navy)", color: "var(--yellow)" }}>
               Scale Your Access
             </span>
@@ -724,49 +727,7 @@ export default function HomePage() {
          ============================================= */}
 
 
-      {/* =============================================
-          SECTION 6: IMPACT SNAPSHOT (dark navy)
-         ============================================= */}
-      <section className="section-dark" style={{ borderTop: "1px solid rgba(255,216,0,0.05)" }}>
-        <div className="container">
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", padding: "4rem", backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,216,0,0.1)" }}>
-            {IMPACT_METRICS.map((stat, i) => (
-              <div key={i} style={{ flex: 1, minWidth: "200px" }}>
-                <div style={{ fontSize: "clamp(2.5rem, 5vw, 3.5rem)", fontWeight: 900, color: "var(--white)", lineHeight: 1, letterSpacing: "-0.05em", marginBottom: "0.5rem" }}>
-                  {stat.value}
-                </div>
-                <div className="label-metric" style={{ color: "var(--yellow)", opacity: 0.8 }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* =============================================
-          SECTION 7: CASE STUDIES (off-white)
-         ============================================= */}
-      <section className="section-light" id="cases">
-        <div className="container">
-          <div style={{ marginBottom: "4rem" }}>
-            <h2 className="heading-section" style={{ color: "var(--navy)" }}>
-              Case Studies: Innovators we accelerated
-            </h2>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "2rem" }}>
-            {CASE_STUDIES.map((item, i) => (
-              <div key={i} className="card-bento-light" style={{ display: "flex", flexDirection: "column", gap: "1.25rem", borderBottom: "4px solid transparent", transition: "all 0.3s ease" }}>
-                <div className="label-mono" style={{ color: "var(--yellow)", opacity: 0.8 }}>{item.tag}</div>
-                <h4 className="heading-card" style={{ color: "var(--navy)", fontSize: "1.25rem" }}>{item.title}</h4>
-                <p style={{ fontSize: "0.875rem", color: "rgba(2,47,66,0.6)", lineHeight: 1.7, flexGrow: 1 }}>{item.desc}</p>
-                <div style={{ paddingTop: "1.5rem", borderTop: "1px solid rgba(2,47,66,0.05)", fontSize: "0.7rem", fontWeight: 900, color: "rgba(2,47,66,0.3)", letterSpacing: "0.1em" }}>
-                  {item.meta}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* =============================================
           SECTION 8: CTA CLOSE (dark navy)
@@ -777,8 +738,8 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(var(--yellow) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
         <div className="container" style={{ maxWidth: "48rem", position: "relative", zIndex: 10 }}>
-          <span className="tag-badge" style={{ marginBottom: "2rem", display: "inline-flex" }}>
-            FundabilityOS
+          <span className="tag-badge border-none p-0 inline-flex" style={{ marginBottom: "2rem" }}>
+            <img src="/logo.png" alt="NextBlaze" className="h-14 object-contain brightness-0 invert" />
           </span>
           <h2 className="heading-hero" style={{ marginBottom: "2rem", color: "var(--white)" }}>
             Co-create the <br/><span className="text-gradient">future.</span>

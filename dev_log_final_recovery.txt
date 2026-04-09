@@ -567,3 +567,49 @@ Import trace for requested module:
  ✓ Compiled in 757ms (1201 modules)
  ✓ Compiled in 382ms (503 modules)
  ✓ Compiled in 346ms (503 modules)
+ ✓ Compiled in 288ms (503 modules)
+ ✓ Compiled in 106ms (503 modules)
+ ⨯ ./app/page.tsx
+Error:   [31mx[0m Expected '</', got 'jsx text (
+  [31m|[0m
+  [31m|[0m       )'
+     ,-[[36;1;4m/Users/user/Documents/KarSin/NextBlaze/FundabilityOS/app/page.tsx[0m:573:1]
+ [2m570[0m |                 </div>
+ [2m571[0m |               </div>
+ [2m572[0m |             </div>
+ [2m573[0m | [35;1m,[0m[35;1m-[0m[35;1m>[0m       </section>
+ [2m574[0m | [35;1m|[0m   
+ [2m575[0m | [35;1m`[0m[35;1m-[0m[35;1m>[0m       {/* =============================================
+ [2m576[0m |               SECTION: IMPACT SNAPSHOT
+ [2m577[0m |              ============================================= */}
+ [2m578[0m |           <section className="max-w-[1280px] mx-auto px-6 py-12">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/page.tsx
+ ✓ Compiled in 210ms (490 modules)
+ ⨯ ./app/page.tsx
+Error:   [31mx[0m Expected '</', got 'jsx text (
+  [31m|[0m
+  [31m|[0m       )'
+     ,-[[36;1;4m/Users/user/Documents/KarSin/NextBlaze/FundabilityOS/app/page.tsx[0m:573:1]
+ [2m570[0m |                 </div>
+ [2m571[0m |               </div>
+ [2m572[0m |             </div>
+ [2m573[0m | [35;1m,[0m[35;1m-[0m[35;1m>[0m       </section>
+ [2m574[0m | [35;1m|[0m   
+ [2m575[0m | [35;1m`[0m[35;1m-[0m[35;1m>[0m       {/* =============================================
+ [2m576[0m |               SECTION: IMPACT SNAPSHOT
+ [2m577[0m |              ============================================= */}
+ [2m578[0m |           <section className="max-w-[1280px] mx-auto px-6 py-12">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/page.tsx
+ ✓ Compiled in 76ms (490 modules)
