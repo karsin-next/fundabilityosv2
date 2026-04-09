@@ -48,7 +48,7 @@ export default function TeamDiagnosticPage() {
             </div>
             <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#ffd800] mb-4">Investor Lens</h4>
             <p className="text-xs leading-relaxed text-[#b0d0e0] font-medium uppercase tracking-tight">
-              &quot;Does the team have the technical capability and the commercial grit to survive the 'Desert of Death'? Do they have a long history together?&quot;
+              &quot;Does the team have the technical capability and the commercial grit to survive the &apos;Desert of Death&apos;? Do they have a long history together?&quot;
             </p>
           </div>
 
