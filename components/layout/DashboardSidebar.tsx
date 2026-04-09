@@ -30,7 +30,7 @@ interface NavSection {
 }
 
 // Full sitemap tree structure from Table 1 Methodology
-const siteMap = [
+const siteMap: NavSection[] = [
   {
     label: "1. DIAGNOSE – Establish Baseline",
     items: [
