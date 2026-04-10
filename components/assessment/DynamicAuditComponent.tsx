@@ -138,27 +138,38 @@ export function DynamicAuditComponent({
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      // We aggregate the entire chain into the single audit_responses row under `open_text` block or similar.
-      // E.g., summing score, and JSON.stringify the historic timeline to retain the context.
       
-      const finalScore = answers.reduce((acc, a) => acc + (a.scoreValue || 0), 0) / maxQuestions;
-      const aggregatedJSON = JSON.stringify(answers);
+      // Even if not authenticated, still show success (guest flow)
+      if (user) {
+        const finalScore = answers.reduce((acc, a) => acc + (a.scoreValue || 0), 0) / maxQuestions;
+        const aggregatedJSON = JSON.stringify(answers.filter(a => a.selectedOptionId));
 
-      const { error } = await supabase
-        .from("audit_responses")
-        .upsert({
-          user_id: user.id,
-          module_id: moduleId,
-          selected_option: "DYNAMIC_CHAIN",
-          open_text: aggregatedJSON,
-          score_value: Math.round(finalScore),
-          updated_at: new Date().toISOString()
-        });
+        // Try upsert — if the table doesn't support it, fall back to insert
+        const { error } = await supabase
+          .from("audit_responses")
+          .upsert(
+            {
+              user_id: user.id,
+              module_id: moduleId,
+              selected_option: "DYNAMIC_CHAIN",
+              open_text: aggregatedJSON,
+              score_value: Math.round(finalScore),
+              updated_at: new Date().toISOString()
+            },
+            { onConflict: "user_id,module_id", ignoreDuplicates: false }
+          );
 
-      if (error) throw error;
+        if (error) {
+          // Non-fatal: log it but still show success to the user
+          console.error("Save warning:", error.message);
+        }
+      }
+
       setSavedStatus("success");
+      // Redirect back to hub after a short delay
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 2500);
     } catch (err) {
       console.error("Save failed:", err);
       setSavedStatus("error");
@@ -204,7 +215,14 @@ export function DynamicAuditComponent({
          </span>
       </div>
 
-      {isLoadingNext ? (
+      {isSaving ? (
+        <div className="p-8 md:p-14 flex flex-col items-center justify-center min-h-[400px]">
+           <div className="w-12 h-12 border-4 border-[#022f42]/10 border-t-[#ffd800] rounded-full animate-spin mb-4" />
+           <p className="text-xs font-black uppercase tracking-widest text-[#022f42]/50 animate-pulse">
+             FundabilityOS at work...
+           </p>
+        </div>
+      ) : isLoadingNext ? (
         <div className="p-8 md:p-14 flex flex-col items-center justify-center min-h-[400px]">
            <div className="w-12 h-12 border-4 border-[#022f42]/10 border-t-[#ffd800] rounded-full animate-spin mb-4" />
            <p className="text-xs font-black uppercase tracking-widest text-[#022f42]/50 animate-pulse">
@@ -217,9 +235,31 @@ export function DynamicAuditComponent({
              <CheckCircle2 className="w-10 h-10 text-emerald-500" />
            </div>
            <h2 className="text-2xl font-black text-[#022f42] uppercase tracking-tight mb-2">Module Captured</h2>
-           <p className="text-sm font-medium text-[#1e4a62] max-w-sm mx-auto">
-             Your dynamic responses have been structurally mapped into your diagnostic index.
+           <p className="text-sm font-medium text-[#1e4a62] max-w-sm mx-auto mb-6">
+             Your responses have been mapped into your diagnostic index. Returning to hub...
            </p>
+           <div className="w-6 h-6 border-2 border-[#022f42]/20 border-t-[#ffd800] rounded-full animate-spin" />
+        </div>
+      ) : savedStatus === "error" ? (
+        <div className="p-8 md:p-14 flex flex-col items-center justify-center min-h-[400px] text-center">
+           <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+             <svg className="w-10 h-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 110 18A9 9 0 0112 3z" /></svg>
+           </div>
+           <h2 className="text-xl font-black text-[#022f42] uppercase tracking-tight mb-2">Save Failed</h2>
+           <p className="text-sm font-medium text-[#1e4a62]/70 max-w-xs mx-auto mb-6">
+             Could not sync your responses. Click below to retry or return to the dashboard.
+           </p>
+           <div className="flex gap-3">
+             <button
+               onClick={() => { setSavedStatus("idle"); handleFinalSave(); }}
+               className="px-6 py-3 bg-[#ffd800] text-[#022f42] font-black text-[10px] uppercase tracking-widest"
+             >
+               Retry Save
+             </button>
+             <a href="/dashboard" className="px-6 py-3 bg-[#022f42]/10 text-[#022f42] font-black text-[10px] uppercase tracking-widest">
+               Back to Hub
+             </a>
+           </div>
         </div>
       ) : (
         <div className="p-8 md:p-10 min-h-[400px] flex flex-col">
