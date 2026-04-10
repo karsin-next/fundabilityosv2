@@ -208,7 +208,7 @@ export function DynamicAuditComponent({
         <div className="p-8 md:p-14 flex flex-col items-center justify-center min-h-[400px]">
            <div className="w-12 h-12 border-4 border-[#022f42]/10 border-t-[#ffd800] rounded-full animate-spin mb-4" />
            <p className="text-xs font-black uppercase tracking-widest text-[#022f42]/50 animate-pulse">
-             Synthesizing Neural Pathway...
+             FundabilityOS at work...
            </p>
         </div>
       ) : savedStatus === "success" ? (
