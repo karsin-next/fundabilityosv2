@@ -4,6 +4,7 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useAuth } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function DashboardLayout({
   children,
