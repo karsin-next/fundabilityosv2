@@ -17,7 +17,7 @@ import {
 
 interface ReasoningTrace {
   id: string;
-  audit_id: string;
+  report_id: string;
   primary_thought: string;
   critic_thought: string;
   consensus_delta: string;
