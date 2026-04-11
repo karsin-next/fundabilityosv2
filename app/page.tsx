@@ -329,7 +329,7 @@ export default function HomePage() {
          ============================================= */}
       <section
         className="section-dark"
-        style={{ paddingTop: "clamp(2rem, 4vw, 3rem)", paddingBottom: "clamp(2rem, 4vw, 3rem)", minHeight: "auto", display: "flex", alignItems: "center" }}
+        style={{ paddingTop: "15px", paddingBottom: "clamp(2rem, 4vw, 3rem)", minHeight: "auto", display: "flex", alignItems: "center" }}
       >
         <div className="container">
             <div
