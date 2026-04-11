@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle, CheckCircle2, AlertCircle, TrendingUp, Users, FileText, Shield, Zap, Sparkles, LayoutDashboard, Database, Globe, Lock } from "lucide-react";
 import ScoreGaugeMock from "@/components/score/ScoreGaugeMock";
+import QuickAssess from "@/components/assessment/QuickAssess";
 import ScoreDashboard from "@/components/assessment/ScoreDashboard";
 import LeadCaptureGate from "@/components/auth/LeadCaptureGate";
 import { useAuth } from "@/context/AuthContext";
