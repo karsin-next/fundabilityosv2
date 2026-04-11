@@ -2,10 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 // Routes that require the user to be authenticated
-const PROTECTED_ROUTES = ["/dashboard", "/report", "/directory"];
-
-// Routes that require is_admin = true
-const ADMIN_ROUTES = ["/admin"];
+const PROTECTED_ROUTES = ["/dashboard", "/report", "/directory", "/admin"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -48,7 +45,6 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
-  const isAdmin = ADMIN_ROUTES.some((r) => pathname.startsWith(r));
 
   // Redirect unauthenticated users away from protected routes
   if (isProtected && !user) {
@@ -58,25 +54,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Admin routes: check is_admin flag
-  if (isAdmin) {
-    if (!user) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
-      url.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(url);
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_admin")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile?.is_admin) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  }
+  return supabaseResponse;
+}
 
   return supabaseResponse;
 }
