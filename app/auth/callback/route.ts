@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
  * OAuth and Email Magic Link callback handler.
@@ -26,8 +26,11 @@ export async function GET(request: NextRequest) {
     if (!exchangeError && session) {
       const user = session.user;
       
-      // Sync user metadata to profiles table if it doesn't exist
-      const { data: profile } = await supabase
+      // Use Service Role client to bypass RLS during profile creation/sync
+      // This ensures new Social Auth users are ALWAYS correctly registered
+      const supabaseAdmin = createServiceClient();
+      
+      const { data: profile } = await supabaseAdmin
         .from("profiles")
         .select("id")
         .eq("id", user.id)
@@ -35,7 +38,7 @@ export async function GET(request: NextRequest) {
         
       if (!profile) {
         // Use type-casting to ensure build passes regardless of complex circular DB types
-        await (supabase.from("profiles") as any).insert({
+        await (supabaseAdmin.from("profiles") as any).insert({
           id: user.id,
           email: user.email,
           full_name: user.user_metadata?.full_name || user.user_metadata?.name || "",
