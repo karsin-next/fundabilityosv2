@@ -172,25 +172,6 @@ export default function AuditHubPage() {
         </div>
       </div>
 
-      {/* AI Fast-Track Section */}
-      <div className="mb-20 glass-premium p-1">
-        <div className="p-10 bg-white shadow-xl flex flex-col md:flex-row gap-12 items-center">
-           <div className="max-w-md">
-              <div className="flex items-center gap-3 mb-6">
-                <Sparkles className="w-5 h-5 text-[#ffd800]" />
-                <h2 className="text-xs font-black text-[#022f42] uppercase tracking-[0.3em] leading-none">Neural Speed-Run</h2>
-              </div>
-              <h3 className="text-3xl font-black text-[#022f42] tracking-tighter uppercase mb-4 leading-none">Populate all 8 modules <br/><span className="text-[#ffd800] WebkitTextStroke-[1px] WebkitTextStroke-[#022f42]">instantly.</span></h3>
-              <p className="text-sm font-medium text-[#1e4a62]/70 leading-relaxed mb-8">
-                Drop your pitch deck here. Our AI scans 40+ investor metrics and populates your dashboard in seconds, bypassing hours of manual input.
-              </p>
-           </div>
-           <div className="flex-1 w-full">
-              <AIAuditScanner onComplete={() => window.location.reload()} />
-           </div>
-        </div>
-      </div>
-
       {/* Manual Modules Grid */}
       <div className="mb-10 flex items-center justify-between border-b-2 border-[#022f42]/5 pb-6">
         <h2 className="text-sm font-black text-[#022f42] uppercase tracking-[0.3em] flex items-center gap-4">
