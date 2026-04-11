@@ -131,3 +131,15 @@ VALUES (
   true,
   100
 ) ON CONFLICT (version_name) DO NOTHING;
+
+-- 6. RPC: Increment Override Count
+-- Atomically increment the usage counter for an override rule.
+CREATE OR REPLACE FUNCTION public.increment_override_count(override_id uuid)
+RETURNS void AS $$
+BEGIN
+  UPDATE public.logic_overrides
+  SET applied_count = applied_count + 1
+  WHERE id = override_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+

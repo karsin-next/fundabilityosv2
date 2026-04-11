@@ -26,7 +26,7 @@ async function getMatchingOverrides(answersJson: string): Promise<string[]> {
   try {
     const { data } = await supabaseAdmin
       .from("logic_overrides")
-      .select("id, trigger_text, correction_rule")
+      .select("id, trigger_text, correction_rule, applied_count")
       .eq("is_active", true);
 
     if (!data) return [];
@@ -40,7 +40,7 @@ async function getMatchingOverrides(answersJson: string): Promise<string[]> {
         // Fire-and-forget: increment applied_count
         supabaseAdmin
           .from("logic_overrides")
-          .update({ applied_count: supabaseAdmin.rpc ? undefined : undefined })
+          .update({ applied_count: (override.applied_count || 0) + 1 })
           .eq("id", override.id)
           .then(() => {})
           .catch(() => {});
