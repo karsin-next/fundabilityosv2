@@ -38,19 +38,36 @@ export async function GET(request: NextRequest) {
     if (!exchangeError && session) {
       const user = session.user;
       
-      // Use Service Role client to bypass RLS during profile creation/sync
-      // This ensures new Social Auth users are ALWAYS correctly registered
+      // Resilient Profile Sync: Check if trigger created it, otherwise insert manually
       const supabaseAdmin = createServiceClient();
-      
-      const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .single();
-        
+      let profile = null;
+      let retries = 0;
+      const MAX_RETRIES = 3;
+
+      console.log(`[Auth Callback] Checking for profile for user: ${user.id}`);
+
+      while (retries < MAX_RETRIES) {
+        const { data: existingProfile } = await supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .eq("id", user.id)
+          .single();
+
+        if (existingProfile) {
+          profile = existingProfile;
+          console.log(`[Auth Callback] Profile found (Attempt ${retries + 1})`);
+          break;
+        }
+
+        console.log(`[Auth Callback] Profile not found yet, waiting... (Attempt ${retries + 1})`);
+        retries++;
+        if (retries < MAX_RETRIES) {
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1s
+        }
+      }
+
       if (!profile) {
-        console.log("[Auth Callback] No profile found, creating one...");
-        // Use type-casting to ensure build passes regardless of complex circular DB types
+        console.log("[Auth Callback] Profile still missing after retries, attempting manual insert...");
         const { error: insertError } = await (supabaseAdmin.from("profiles") as any).insert({
           id: user.id,
           email: user.email,
@@ -60,17 +77,25 @@ export async function GET(request: NextRequest) {
         });
 
         if (insertError) {
-          console.error("[Auth Callback] Profile Insert Error:", insertError.message);
+          console.error("[Auth Callback] FATAL: Profile Insert Error:", insertError.message);
+          // If insert fails, we might have a unique constraint error (trigger finished late)
+          // Re-fetch one last time
+          const { data: finalCheck } = await supabaseAdmin
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id)
+            .single();
+          if (finalCheck) {
+            console.log("[Auth Callback] Profile confirmed after late insert/conflict.");
+          } else {
+             return NextResponse.redirect(`${origin}/auth/login?error=profile_creation_failed`);
+          }
         } else {
-          console.log("[Auth Callback] Profile created successfully.");
+          console.log("[Auth Callback] Profile created successfully via manual insert.");
         }
-      } else {
-        console.log("[Auth Callback] Profile already exists.");
       }
       
-      console.log("[Auth Callback] SUCCESS: Profile linked. Redirecting to:", redirectTo);
-      
-      // Ensure redirectTo starts with / to prevent invalid URL construction
+      console.log("[Auth Callback] SUCCESS: Redirecting to:", redirectTo);
       const finalDest = redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`;
       return NextResponse.redirect(`${origin}${finalDest}`);
     }
