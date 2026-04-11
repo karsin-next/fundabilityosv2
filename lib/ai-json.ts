@@ -12,9 +12,9 @@ export function extractAIJSON<T = any>(text: string): T {
     const jsonMatch = text.match(/(\{[\s\S]*\})/);
     
     if (jsonMatch) {
+      let cleaned = "";
       try {
-        // Clean up possible markdown fences inside the match
-        const cleaned = jsonMatch[1]
+        cleaned = jsonMatch[1]
           .replace(/```json\s*/gi, "")
           .replace(/```\s*/g, "")
           .trim();
