@@ -2,7 +2,7 @@
 
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useAuth } from "@/context/AuthContext";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -12,9 +12,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-[#f2f6fa]">
         <div className="flex flex-col items-center gap-4">
@@ -23,11 +30,6 @@ export default function DashboardLayout({
         </div>
       </div>
     );
-  }
-
-  // Protected route check
-  if (!user) {
-    redirect("/auth/login");
   }
 
   return (

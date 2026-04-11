@@ -38,12 +38,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       
       if (authUser) {
-        // Fetch profile data
-        const { data: profile } = await supabase
+        // Force fresh profile fetch — no caching
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
-          .select("*")
+          .select("id, email, full_name, company_name, role, is_admin, fundability_score")
           .eq("id", authUser.id)
           .single();
+
+        if (profileError) {
+          console.error("[AuthContext] Profile fetch error:", profileError.message);
+        }
 
         setUser({
           id: authUser.id,
@@ -51,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           full_name: profile?.full_name,
           company_name: profile?.company_name,
           role: profile?.role,
-          is_admin: profile?.is_admin,
+          is_admin: profile?.is_admin === true, // Strict boolean coercion
           fundability_score: profile?.fundability_score,
         });
       } else {
