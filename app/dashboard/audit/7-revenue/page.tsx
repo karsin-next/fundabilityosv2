@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { BarChart3, ArrowLeft, Target, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function RevenueDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="7-revenue"
-          questionTitle="How would you characterize the 'Durability' and 'Predictability' of your primary revenue stream?"
-          options={revenueOptions}
-          placeholder="How much does it cost you to acquire $1 of revenue (CAC)? What is your gross margin, and how do you plan to scale without hiring linearly?"
-          onSave={(data) => console.log("Revenue diagnostic saved", data)}
+          moduleContext="Margin, LTV, and CAC viability."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "Describe your pricing elasticity. Why can't you double your prices today without losing your core accounts?",
+            options: revenueOptions,
+            placeholder: "Defend your margin structure. Explain how you plan to scale without hiring linearly."
+          }}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">

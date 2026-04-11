@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { TrendingUp, ArrowLeft, Target, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function PMFDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="6-pmf"
-          questionTitle="What is the strongest quantitative signal of 'Product-Market Pull' you are observing?"
-          options={pmfOptions}
-          placeholder="If you turned off all paid marketing today, what would happen to your growth? Describe your most successful case study or customer success story."
-          onSave={(data) => console.log("PMF diagnostic saved", data)}
+          moduleContext="Proof of repeatable sales velocity."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "What empirical proof (usage retention or revenue repetition) demonstrates you have moved past the early-adopter phase?",
+            options: pmfOptions,
+            placeholder: "If you turned off all paid marketing today, what would happen to your growth? Describe your most successful use case."
+          }}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">

@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { Users, ArrowLeft, Target, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function TeamDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="8-team"
-          questionTitle="Which 'Founding DNA' best characterizes your team's unique path to execution?"
-          options={teamOptions}
-          placeholder="List your core founders and their top 2 professional achievements. Why is this specific team the only ones who can solve this problem?"
-          onSave={(data) => console.log("Team diagnostic saved", data)}
+          moduleContext="Execution risk and unfair advantages."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "What critical skill gap currently exists in the founding team that will prevent you from hitting your next milestone?",
+            options: teamOptions,
+            placeholder: "Don't sell your strengths here. Be honest about your team's execution weakness. What roles do you desperately need capital to hire?"
+          }}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">

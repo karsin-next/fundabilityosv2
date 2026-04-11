@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { Swords, ArrowLeft, Target, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function CompetitorDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="3-competitor"
-          questionTitle="What is the fundamental nature of your competitive 'White Space'?"
-          options={competitorOptions}
-          placeholder="List your top 3 direct competitors and explain exactly why a customer would switch to you today. What is their 'unhappy path' with the status quo?"
-          onSave={(data) => console.log("Competitor diagnostic saved", data)}
+          moduleContext="Defensive moats and whitespace analysis."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "Name your most dangerous competitor and explain why a customer would choose them over you.",
+            options: competitorOptions,
+            placeholder: "List your top competitor and explain exactly why a customer would switch to you today. What is their 'unhappy path' with the status quo?"
+          }}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">

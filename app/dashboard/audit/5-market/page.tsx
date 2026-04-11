@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { Globe, ArrowLeft, Target, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function MarketDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="5-market"
-          questionTitle="How do you characterize the 'Timing' and 'Magnitude' of your market opportunity?"
-          options={marketOptions}
-          placeholder="What is the 'Why Now?' factor? Is there a regulatory change, a technical breakthrough, or a cultural shift making your solution inevitable?"
-          onSave={(data) => console.log("Market diagnostic saved", data)}
+          moduleContext="Top-down TAM vs Bottom-up SOM believability."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "How many exact accounts exist in your serviceable market, and what is the realistic capture rate in 24 months?",
+            options: marketOptions,
+            placeholder: "Don't use top-down reports. Explain your SOM: Who are they, how many exist, and what percentage can you capture?"
+          }}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">

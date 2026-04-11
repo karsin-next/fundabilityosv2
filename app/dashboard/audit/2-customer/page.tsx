@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { Users, ArrowLeft, Target, BookOpen } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function CustomerDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="2-customer"
-          questionTitle="How would you classify the economic maturity and role of your primary buyer?"
-          options={customerOptions}
-          placeholder="Who specifically signs the check? Describe their job title, their biggest professional KPI, and why they would choose 'now' to buy your solution."
-          onSave={(data) => console.log("Customer diagnostic saved", data)}
+          moduleContext="Validating ICP maturity and enterprise value."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "Who specifically is the economic buyer, and what strict KPI triggers their purchase decision?",
+            options: customerOptions,
+            placeholder: "Describe their job title, their biggest professional KPI, and why they would choose 'now' to buy your solution."
+          }}
         />
 
         {/* Supporting Context Cards */}

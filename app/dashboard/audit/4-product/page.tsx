@@ -1,6 +1,6 @@
 "use client";
 
-import { PredictiveAuditQuestion } from "@/components/assessment/PredictiveAuditQuestion";
+import { DynamicAuditComponent } from "@/components/assessment/DynamicAuditComponent";
 import { Package, ArrowLeft, Target, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -33,12 +33,15 @@ export default function ProductDiagnosticPage() {
       </div>
 
       <div className="space-y-8">
-        <PredictiveAuditQuestion
+        <DynamicAuditComponent
           moduleId="4-product"
-          questionTitle="Which stage best describes your current technical 'Proof of Value'?"
-          options={productOptions}
-          placeholder="What is the single most important 'Aha!' moment a user has in your product? Describe the core technical breakthrough that makes your solution possible."
-          onSave={(data) => console.log("Product diagnostic saved", data)}
+          moduleContext="Execution velocity and scalability risk."
+          maxQuestions={5}
+          initialQuestion={{
+            questionTitle: "What is the primary technical or operational bottleneck preventing you from scaling 10x right now?",
+            options: productOptions,
+            placeholder: "Describe the core technical risk. Is it architecture, hiring, or dependencies on third-party platforms?"
+          }}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
