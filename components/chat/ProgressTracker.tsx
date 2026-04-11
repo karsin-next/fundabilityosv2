@@ -25,12 +25,9 @@ export default function ProgressTracker({ currentDimension, coveredDimensions = 
   return (
     <div className="w-full">
       {/* Header row */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
-        <span className="label-mono text-[#ffd800] text-[0.6rem] md:text-[0.65rem]">
+      <div className="mb-3">
+        <span className="text-[#ffd800] text-[10px] md:text-xs font-mono uppercase tracking-widest font-black block">
           FundabilityOS QuickAssess
-        </span>
-        <span className="label-metric opacity-60 text-[0.6rem] md:text-[0.65rem] uppercase tracking-wider">
-          Dynamic Profiling Active
         </span>
       </div>
 
@@ -43,56 +40,23 @@ export default function ProgressTracker({ currentDimension, coveredDimensions = 
           return (
             <div
               key={dim}
-              style={{
-                fontSize: "0.55rem",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                padding: "4px 9px",
-                borderRadius: "3px",
-                fontFamily: "var(--font-sans)",
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                backgroundColor: isCurrent 
-                  ? "var(--yellow)" 
-                  : isDone 
-                  ? "rgba(255,216,0,0.12)" 
-                  : "rgba(255,255,255,0.03)",
-                color: isCurrent 
-                  ? "var(--navy)" 
-                  : isDone 
-                  ? "var(--yellow)" 
-                  : "rgba(255,255,255,0.2)",
-                border: isCurrent
-                  ? "1px solid var(--yellow)"
-                  : "1px solid rgba(255,255,255,0.06)",
-                boxShadow: isCurrent ? "0 0 15px rgba(255,216,0,0.3)" : "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px"
-              }}
+              className={`flex items-center gap-1.5 text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-1 md:px-2.5 md:py-1.5 rounded-sm transition-all duration-300 font-sans border ${
+                isCurrent
+                  ? "bg-[#ffd800] text-[#022f42] border-[#ffd800] shadow-[0_0_15px_rgba(255,216,0,0.3)]"
+                  : isDone
+                  ? "bg-[#ffd800]/10 text-[#ffd800] border-[#ffd800]/20"
+                  : "bg-white/5 text-white/40 border-white/10"
+              }`}
             >
-              {isDone && <span style={{ fontSize: "0.65rem" }}>✓</span>}
+              {isDone && <span className="text-[10px] md:text-xs leading-none">✓</span>}
               {dim}
               {isCurrent && (
-                <span style={{ 
-                  width: "4px", 
-                  height: "4px", 
-                  borderRadius: "50%", 
-                  backgroundColor: "var(--navy)",
-                  animation: "pulse 1s infinite"
-                }} />
+                <span className="w-1 h-1 rounded-full bg-[#022f42] animate-pulse" />
               )}
             </div>
           );
         })}
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes pulse {
-          0% { transform: scale(0.8); opacity: 0.5; }
-          50% { transform: scale(1.2); opacity: 1; }
-          100% { transform: scale(0.8); opacity: 0.5; }
-        }
-      `}} />
     </div>
   );
 }
