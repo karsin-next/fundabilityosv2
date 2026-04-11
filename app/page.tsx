@@ -434,7 +434,7 @@ export default function HomePage() {
             </div>
 
             {/* Right / Bottom Content */}
-            <div className={(scoringResult && showAssessment) ? "w-full" : "hero-right w-full"} style={{ animation: "fadeInAssessment 0.6s ease" }}>
+            <div className={(scoringResult && showAssessment) ? "w-full" : "hero-right w-full mt-12 md:mt-0"} style={{ animation: "fadeInAssessment 0.6s ease" }}>
               
               {!showAssessment && (
                 <div className="animate-fade-in delay-200" style={{ display: "flex", justifyContent: "center" }}>
@@ -629,7 +629,6 @@ export default function HomePage() {
         <style>{`
           @media (max-width: 900px) {
             .hero-grid { grid-template-columns: 1fr !important; }
-            .hero-right { display: none !important; }
           }
           @keyframes fadeInAssessment {
             from { opacity: 0; transform: scale(0.99); }
