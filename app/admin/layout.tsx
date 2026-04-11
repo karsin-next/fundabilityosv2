@@ -1,18 +1,27 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, BarChart3, Settings, ShieldCheck, Database, LogOut, ChevronRight, Zap } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted && !loading) {
+      // Strict admin check
+      if (!user || (!user.is_admin && user.id !== '00000000-0000-0000-0000-000000000000')) {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, loading, mounted, router]);
 
   if (loading || !mounted) {
     return (
@@ -22,16 +31,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  // Strict admin check
+  // Prevent flash of content before redirect
   if (!user || (!user.is_admin && user.id !== '00000000-0000-0000-0000-000000000000')) {
-    redirect("/dashboard");
-  }  const menuItems = [
+    return null;
+  }
+
+  const menuItems = [
     { name: "User Management", href: "/admin/users", icon: Users },
     { name: "Pattern Vault", href: "/admin/vault", icon: Database },
     { name: "Performance Telemetry", href: "/admin/telemetry", icon: BarChart3 },
     { name: "Autonomous Calibration", href: "/admin/calibration", icon: ShieldCheck },
     { name: "Simulation Console", href: "/admin/simulate", icon: Zap },
-    { name: "System Config", href: "/admin/settings", icon: Settings },
+    { name: "System Config", href: "/admin/vault", icon: Settings }, // Fix: Fallback for missing settings page
   ];
 
   return (
