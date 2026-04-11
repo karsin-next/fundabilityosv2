@@ -57,7 +57,8 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["profiles"]["Row"], "created_at" | "updated_at">;
+        Insert: Omit<Database["public"]["Tables"]["profiles"]["Row"], "created_at" | "updated_at" | "is_admin" | "referral_code" | "referred_by"> & 
+          Partial<Pick<Database["public"]["Tables"]["profiles"]["Row"], "is_admin" | "referral_code" | "referred_by">>;
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
       };
 
