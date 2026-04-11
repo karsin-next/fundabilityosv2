@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { createServiceClient } from "@/lib/supabase/server";
 
 /**
  * OAuth and Email Magic Link callback handler.
  * Supabase redirects here after email confirmation or OAuth.
- * Relocated to /api/auth/callback to ensure stable routing on Vercel.
+ * Uses a request/response-aware client to correctly handle PKCE cookie exchange.
  */
 export async function GET(request: NextRequest) {
   console.log("[Auth Callback] [TOP] Request received at:", request.url);
   const { searchParams } = new URL(request.url);
-  // On Vercel, request.url might use http or internal domains. 
-  // Let's ensure we use the production origin if possible.
   const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
   
   const code = searchParams.get("code");
@@ -18,7 +17,7 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
 
-  // Handle OAuth error
+  // Handle OAuth error passed in the URL
   if (error) {
     return NextResponse.redirect(
       `${origin}/auth/login?error=${encodeURIComponent(errorDescription || error)}`
@@ -26,9 +25,33 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    console.log("[Auth Callback] Authentication code detected. Initializing Supabase client...");
-    const supabase = await createClient();
-    
+    console.log("[Auth Callback] Authentication code detected. Building request-aware Supabase client...");
+
+    // Build the initial redirect response so we can attach cookies to it
+    const finalDest = redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`;
+    let response = NextResponse.redirect(`${origin}${finalDest}`);
+
+    // Create a Supabase client that reads cookies from the REQUEST
+    // and writes session cookies directly to the RESPONSE.
+    // This is critical for PKCE flow — using next/headers cookies() silently
+    // fails to retrieve the code verifier in a Route Handler context.
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+
     console.log("[Auth Callback] Exchanging code for session...");
     const { data: { session }, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
@@ -97,9 +120,9 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      console.log("[Auth Callback] SUCCESS: Redirecting to:", redirectTo);
-      const finalDest = redirectTo.startsWith("/") ? redirectTo : `/${redirectTo}`;
-      return NextResponse.redirect(`${origin}${finalDest}`);
+      console.log("[Auth Callback] SUCCESS: Redirecting to dashboard with session cookies set.");
+      // Return the pre-built `response` — it already has the session cookies attached
+      return response;
     }
 
     console.error("[Auth Callback] ERROR: Valid session not established after exchange.");
