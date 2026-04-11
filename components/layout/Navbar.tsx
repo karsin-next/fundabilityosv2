@@ -70,9 +70,7 @@ export default function Navbar() {
           <Link href="/#cases" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
             Case Studies
           </Link>
-          <Link href="/academy" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1 flex items-center gap-1">
-            Academy <span className="bg-[#ffd800] text-[#022f42] text-[8px] px-1 py-0.5 rounded-sm ml-1">NEW</span>
-          </Link>
+
           <Link href="/methodology" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
             Methodology
           </Link>
@@ -94,15 +92,7 @@ export default function Navbar() {
                   Logout
                 </button>
               </>
-            ) : (
-              <Link
-                href="/auth/login"
-                onClick={() => setMenuOpen(false)}
-                className="bg-[#ffd800] border-2 border-[#ffd800] text-[#022f42] hover:bg-transparent hover:text-[#ffd800] px-6 py-2 font-bold text-sm uppercase tracking-widest transition-all text-center shadow-md"
-              >
-                FundabilityOS
-              </Link>
-            )}
+            ) : null}
           </div>
         </nav>
       </div>

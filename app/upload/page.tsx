@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Upload, FileText, X, ArrowRight, CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import LeadCaptureGate from "@/components/auth/LeadCaptureGate";
 
 type UploadState = "idle" | "uploading" | "extracting" | "done" | "error";
 
@@ -222,7 +223,8 @@ export default function UploadPage() {
   return (
     <div style={{ paddingTop: "68px", backgroundColor: "var(--navy)", minHeight: "100vh" }}>
       <div style={{ padding: "clamp(3rem, 6vw, 5rem) 1.25rem" }}>
-        <div style={{ maxWidth: "640px", marginInline: "auto" }}>
+        <LeadCaptureGate>
+          <div style={{ maxWidth: "640px", marginInline: "auto" }}>
           {/* Header */}
           <div style={{ marginBottom: "2.5rem" }}>
             <span className="tag-badge" style={{ marginBottom: "1rem" }}>Alternative to the Interview</span>
@@ -334,6 +336,7 @@ export default function UploadPage() {
             </div>
           </div>
         </div>
+        </LeadCaptureGate>
       </div>
     </div>
   );

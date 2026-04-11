@@ -122,11 +122,22 @@ export default function ScoreDashboard({ scoringResult, handleReset }: Props) {
               <p className="text-white/40 text-[11px] font-medium">{scoringResult.action_items[0]?.action || "Review full insights inside dashboard."}</p>
            </div>
            <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/checkout" className="btn btn-ghost border-white/20 text-white hover:bg-white hover:text-[#022f42] px-6 py-4 font-black uppercase tracking-widest text-[10px] shadow-xl transition-all flex items-center gap-2 group">
+              <Link 
+                href="/checkout" 
+                onClick={() => {
+                  fetch("/api/track-click", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                      event_name: "clicked_unlock_29", 
+                      email: typeof window !== "undefined" ? localStorage.getItem("guest_email") : null,
+                      metadata: { source: "score_dashboard", score: scoringResult.score }
+                    })
+                  }).catch(() => {});
+                }}
+                className="btn btn-ghost border-white/20 text-white hover:bg-white hover:text-[#022f42] px-6 py-4 font-black uppercase tracking-widest text-[10px] shadow-xl transition-all flex items-center gap-2 group"
+              >
                 UNLOCK FULL 8-DIMENSION SCORES ($29) <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="/dashboard" className="bg-[#ffd800] text-[#022f42] px-8 py-4 font-black uppercase tracking-widest text-[10px] shadow-xl hover:bg-white transition-all flex items-center gap-2 group">
-                ENTER DASHBOARD <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
               </Link>
            </div>
         </div>

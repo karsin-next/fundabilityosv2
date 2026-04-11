@@ -2,6 +2,7 @@
 
 import QuickAssess from "@/components/assessment/QuickAssess";
 import ScoreDashboard from "@/components/assessment/ScoreDashboard";
+import LeadCaptureGate from "@/components/auth/LeadCaptureGate";
 import { useState } from "react";
 import type { ScoringResult } from "@/lib/scoring";
 
@@ -23,7 +24,9 @@ export default function InterviewPage() {
             </div>
             
             <div style={{ backgroundColor: "rgba(255,255,255,0.02)", borderRadius: "12px", border: "1px solid var(--yellow-10)", padding: "2.5rem", maxWidth: "800px", margin: "0 auto" }}>
-              <QuickAssess isEmbedded={true} onComplete={setScoringResult} />
+              <LeadCaptureGate>
+                <QuickAssess isEmbedded={true} onComplete={setScoringResult} />
+              </LeadCaptureGate>
             </div>
           </>
         ) : (
