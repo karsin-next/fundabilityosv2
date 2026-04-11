@@ -85,8 +85,8 @@ function LoginContent() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        // Simplified to exact match for Supabase Dashboard allowlist
-        redirectTo: `${window.location.origin}/auth/callback`,
+        // Updated to /api/auth/callback for stable routing
+        redirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
     if (error) setError(error.message);
