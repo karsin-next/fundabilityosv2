@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mounted && !loading) {
       // Strict admin check
-      const isAdmin = user.is_admin || user.role === 'admin' || user.email === 'karsin@nextblaze.asia' || user.id === '00000000-0000-0000-0000-000000000000';
+      const isAdmin = user?.is_admin || user?.role === 'admin' || user?.email === 'karsin@nextblaze.asia' || user?.id === '00000000-0000-0000-0000-000000000000';
       if (!user || !isAdmin) {
         router.push("/dashboard");
       }
