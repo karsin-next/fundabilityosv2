@@ -177,7 +177,7 @@ export default function UploadPage() {
           )}
 
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <Link href="/interview" className="btn btn-primary btn-lg">
+            <Link href="/interview?source=deck" className="btn btn-primary btn-lg">
               Continue to AI Interview <ArrowRight size={16} />
             </Link>
             <button onClick={() => { setFile(null); setExtracted(null); setUploadState("idle"); setProgress(0); }} className="btn btn-ghost">

@@ -33,11 +33,19 @@ export async function POST(req: NextRequest) {
       if (deckContext && Object.keys(deckContext).length > 0) {
         promptContext += "Start: Acknowledge deck data and jump to the most critical missing fundability data point.";
       } else {
-        promptContext += "Start: This is a brand new company. Ask for their name and core mission.";
-      }
-    } else {
-      promptContext += "HISTORY:\n" + JSON.stringify(history, null, 2);
+      promptContext += "Start: This is a brand new company. Ask for their Industry/Vertical first as part of Phase 1: Profiling.";
     }
+  } else {
+    promptContext += "HISTORY:\n" + JSON.stringify(history, null, 2);
+  }
+
+  // Inject runtime safeguard to hard-enforce Phase 1 vs Phase 2
+  const hasDeck = deckContext && Object.keys(deckContext).length > 0;
+  if (!hasDeck && history.length < 5) {
+    promptContext += "\n\n[SYSTEM SAFEGUARD: You are currently in Phase 1 (Profiling). You MUST ask a basic profiling question. Do NOT ask deep dimension questions (Runway, CAC, etc.) yet.]";
+  } else if (!hasDeck && history.length === 5) {
+    promptContext += "\n\n[SYSTEM SAFEGUARD: You have completed Phase 1. You may now begin Phase 2: Deep Dive into the 8 dimensions.]";
+  }
 
     // Create a TransformStream to pipe Claude's output to the client
     const encoder = new TextEncoder();

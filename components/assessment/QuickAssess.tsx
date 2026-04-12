@@ -120,6 +120,15 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
   useEffect(() => {
     if (!initRendered.current) {
       initRendered.current = true;
+      
+      // Data Leakage Fix: If we didn't just come from the upload deck flow, clear any stale pitch deck logic.
+      if (typeof window !== "undefined") {
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.get("source") !== "deck") {
+          localStorage.removeItem("PITCH_DECK_CONTEXT");
+        }
+      }
+
       fetchNextNode([]);
     }
   }, [fetchNextNode]);
@@ -163,6 +172,7 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
       const result: ScoringResult = JSON.parse(jsonString.replace(/```json/g, "").replace(/```/g, "").trim());
       setScoringResult(result);
       setState("done");
+      localStorage.removeItem("PITCH_DECK_CONTEXT"); // Clear context to prevent data leakage to next assessment
       if (onComplete) onComplete(result);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Analysis failed");
@@ -192,6 +202,7 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
   };
 
   const handleReset = () => {
+    localStorage.removeItem("PITCH_DECK_CONTEXT"); // Ensure clean slate
     setHistory([]);
     setActiveQuestion(null);
     setCoveredDimensions([]);
