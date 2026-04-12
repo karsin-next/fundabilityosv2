@@ -121,9 +121,9 @@ export default function ScoreDashboard({ scoringResult, handleReset }: Props) {
               <div className="text-white text-xs font-black uppercase tracking-widest mb-2">Priority 1 Action</div>
               <p className="text-white/40 text-[11px] font-medium">{scoringResult.action_items[0]?.action || "Review full insights inside dashboard."}</p>
            </div>
-           <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <Link 
-                href="/checkout" 
+                href="/coming-soon" 
                 onClick={() => {
                   fetch("/api/track-click", {
                     method: "POST",
