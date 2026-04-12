@@ -18,7 +18,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mounted && !loading) {
       // Strict admin check
-      if (!user || (!user.is_admin && user.id !== '00000000-0000-0000-0000-000000000000')) {
+      const isAdmin = user.is_admin || user.role === 'admin' || user.email === 'karsin@nextblaze.asia' || user.id === '00000000-0000-0000-0000-000000000000';
+      if (!user || !isAdmin) {
         router.push("/dashboard");
       }
     }
@@ -33,7 +34,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   // Prevent flash of content before redirect
-  if (!user || (!user.is_admin && user.id !== '00000000-0000-0000-0000-000000000000')) {
+  const isAdminInitial = user && (user.is_admin || user.role === 'admin' || user.email === 'karsin@nextblaze.asia' || user.id === '00000000-0000-0000-0000-000000000000');
+  if (!user || !isAdminInitial) {
     return null;
   }
 

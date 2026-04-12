@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           full_name: profile?.full_name,
           company_name: profile?.company_name,
           role: profile?.role,
-          is_admin: profile?.is_admin === true, // Strict boolean coercion
+          is_admin: profile?.is_admin === true || profile?.role === 'admin', // Support both legacy is_admin and new v4 role
           fundability_score: profile?.fundability_score,
         });
       } else {
