@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, BarChart3, Settings, ShieldCheck, Database, LogOut, ChevronRight, Zap, MessageSquareMore, BookMarked } from "lucide-react";
+import { Users, BarChart3, Settings, ShieldCheck, Database, LogOut, ChevronRight, Zap, MessageSquareMore, BookMarked, BarChart2 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -40,6 +40,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   const menuItems = [
+    { name: "Funnel Analytics", href: "/admin/analytics", icon: BarChart2 },
     { name: "User Management", href: "/admin/users", icon: Users },
     { name: "Pattern Vault", href: "/admin/vault", icon: Database },
     { name: "Performance Telemetry", href: "/admin/telemetry", icon: BarChart3 },
