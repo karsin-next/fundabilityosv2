@@ -31,6 +31,8 @@ export default function PitchDeckUploader({ isEmbedded = false }: { isEmbedded?:
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Computed before early returns so TypeScript doesn't narrow away "uploading"/"extracting"
+  const isProcessing = uploadState === "uploading" || uploadState === "extracting";
 
   function validateFile(f: File): string | null {
     if (!ACCEPTED_TYPES.includes(f.type)) return "Only PDF files are accepted.";
@@ -304,9 +306,9 @@ export default function PitchDeckUploader({ isEmbedded = false }: { isEmbedded?:
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
             <button
               onClick={handleUpload}
-              disabled={!file || uploadState === "uploading" || uploadState === "extracting"}
+              disabled={!file || isProcessing}
               className="btn btn-primary btn-lg"
-              style={{ opacity: !file || uploadState === "uploading" || uploadState === "extracting" ? 0.5 : 1 }}
+              style={{ opacity: !file || isProcessing ? 0.5 : 1 }}
             >
               <FileText size={16} />
               {uploadState === "error" ? "Retry Analysis" : "Analyze My Deck"}
