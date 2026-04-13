@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import {
-  Users,
   Mail,
   CheckCircle2,
   TrendingUp,
@@ -27,14 +25,6 @@ interface FunnelData {
   supportSessions: { email: string; created_at: string }[];
 }
 
-const supabaseAdmin =
-  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    ? createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
-    : null;
-
 export default function AnalyticsDashboard() {
   const [data, setData] = useState<FunnelData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,65 +35,12 @@ export default function AnalyticsDashboard() {
   }, []);
 
   async function fetchData() {
-    if (!supabaseAdmin) return;
     setLoading(true);
-
     try {
-      // Fetch leads (email capture events)
-      const { data: leadRows } = await supabaseAdmin
-        .from("analytics_events")
-        .select("user_email, created_at, metadata")
-        .eq("event_name", "lead_captured")
-        .order("created_at", { ascending: false });
-
-      // Fetch starts (interview_started events)
-      const { data: startRows } = await supabaseAdmin
-        .from("analytics_events")
-        .select("id")
-        .eq("event_type", "interview_started");
-
-      // Fetch completions (assessment_completed events)
-      const { data: completionRows } = await supabaseAdmin
-        .from("analytics_events")
-        .select("session_id, session_score, event_data, created_at")
-        .eq("event_type", "assessment_completed")
-        .order("created_at", { ascending: false });
-
-      // Fetch support sessions with emails
-      const { data: supportRows } = await supabaseAdmin
-        .from("support_sessions")
-        .select("email, created_at")
-        .neq("email", "Anonymous")
-        .order("created_at", { ascending: false });
-
-      const leads = (leadRows || []).map((r) => ({
-        email: r.user_email || "—",
-        created_at: r.created_at,
-        source: r.metadata?.path || "/",
-      }));
-
-      const completions = (completionRows || []).map((r) => ({
-        session_id: r.session_id || "—",
-        score: r.session_score || 0,
-        band: r.event_data?.band || "—",
-        created_at: r.created_at,
-      }));
-
-      const scores = completions.map((c) => c.score).filter((s) => s > 0);
-      const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-
-      setData({
-        totalLeads: leads.length,
-        totalStarts: (startRows || []).length,
-        totalCompletions: completions.length,
-        avgScore,
-        leads,
-        completions,
-        supportSessions: (supportRows || []).map((r) => ({
-          email: r.email,
-          created_at: r.created_at,
-        })),
-      });
+      const res = await fetch("/api/admin/analytics");
+      if (!res.ok) throw new Error("Failed to fetch analytics");
+      const json = await res.json();
+      setData(json);
     } catch (err) {
       console.error("Analytics fetch error:", err);
     } finally {
