@@ -66,6 +66,10 @@ export default function PitchDeckUploader({ isEmbedded = false }: { isEmbedded?:
       const formData = new FormData();
       formData.append("file", file);
 
+      // Pass the captured guest email so the API can log it for analytics
+      const guestEmail = typeof window !== "undefined" ? localStorage.getItem("guest_email") || "" : "";
+      if (guestEmail) formData.append("email", guestEmail);
+
       // Simulate upload progress
       const progressInterval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 12, 70));

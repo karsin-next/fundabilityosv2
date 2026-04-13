@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
+    const email = (formData.get("email") as string | null) || "";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -77,6 +78,23 @@ Return ONLY valid JSON, no other text:
 
     // Generate a unique session ID for this upload
     const sessionId = `upload_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    // Track deck upload event with email for admin funnel analytics
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    fetch(`${siteUrl}/api/track-click`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_name: "deck_uploaded",
+        email: email || undefined,
+        metadata: {
+          company_name: extracted.company_name || null,
+          session_id: sessionId,
+          file_name: file.name,
+        },
+      }),
+    }).catch(() => {}); // fire-and-forget
 
     // Return results directly (no need for a separate polling endpoint)
     return NextResponse.json({
