@@ -47,9 +47,12 @@ export default function PitchDeckUploader({ isEmbedded = false }: { isEmbedded?:
 
   function selectFile(f: File) {
     const err = validateFile(f);
-    if (err) { setErrorMsg(err); return; }
+    if (err) { setErrorMsg(err); setFile(null); return; }
     setFile(f);
     setErrorMsg("");
+    // Reset any previous failed state so the Analyze button re-enables
+    setUploadState("idle");
+    setProgress(0);
   }
 
   const handleUpload = useCallback(async () => {
@@ -301,12 +304,12 @@ export default function PitchDeckUploader({ isEmbedded = false }: { isEmbedded?:
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
             <button
               onClick={handleUpload}
-              disabled={!file || uploadState !== "idle"}
+              disabled={!file || uploadState === "uploading" || uploadState === "extracting"}
               className="btn btn-primary btn-lg"
-              style={{ opacity: !file ? 0.5 : 1 }}
+              style={{ opacity: !file || uploadState === "uploading" || uploadState === "extracting" ? 0.5 : 1 }}
             >
               <FileText size={16} />
-              Analyze My Deck
+              {uploadState === "error" ? "Retry Analysis" : "Analyze My Deck"}
             </button>
             <Link href="/interview" className="btn btn-ghost">
               Use Chat Interview Instead
