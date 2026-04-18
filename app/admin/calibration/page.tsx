@@ -11,18 +11,6 @@ import {
   ExternalLink,
   Plus,
   History,
-  Info
-} from "lucide-react";
-
-import { 
-  GitBranch, 
-  Play, 
-  Trash2, 
-  Copy, 
-  Save, 
-  ExternalLink,
-  Plus,
-  History,
   Info,
   X,
   Check
