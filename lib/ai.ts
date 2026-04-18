@@ -18,8 +18,8 @@ export function getAnthropicClient(): Anthropic {
 
 // Model constants — haiku for speed, sonnet for depth
 export const MODELS = {
-  CHAT:      "claude-3-haiku-20240307",    // Stable classic Haiku
-  ANALYSIS:  "claude-3-sonnet-20240229",   // Stable classic Sonnet
+  CHAT:      "claude-3-haiku-20240307",    // Universal model (most compatible)
+  ANALYSIS:  "claude-3-haiku-20240307",    // Universal model (most compatible)
 } as const;
 
 export type ModelKey = keyof typeof MODELS;
