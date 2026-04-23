@@ -4,6 +4,8 @@ import { getAnthropicClient, MODELS } from "@/lib/ai";
 import { SCORING_SYSTEM_PROMPT } from "@/lib/prompts";
 import { trackEvent } from "@/lib/analytics";
 import { sendTelegramAlert } from "@/lib/telegram";
+import { resend } from "@/lib/resend";
+import DiagnosticCompleteEmail from "@/components/emails/DiagnosticCompleteEmail";
 
 export const runtime = "nodejs";
 
@@ -114,7 +116,7 @@ function fireDebateEngine(assessmentId: string, context: string, primaryScore: n
 
 export async function POST(req: NextRequest) {
   try {
-    const { answers, sessionId } = await req.json();
+    const { answers, sessionId, userId, userEmail } = await req.json();
 
     if (!answers) {
       return new Response(JSON.stringify({ error: "answers is required" }), {
@@ -183,6 +185,11 @@ Remember: output ONLY the JSON schema. No preamble, no explanation.`;
             if (jsonMatch) {
               const result = JSON.parse(jsonMatch[0]);
               const score: number = result.score || 0;
+              const reportId = crypto.randomUUID();
+              const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL
+                ? `https://${process.env.VERCEL_URL}`
+                : "http://localhost:3000";
+              const reportUrl = `${baseUrl}/report/${reportId}`;
 
               // 1. Track event
               trackEvent("assessment_completed", {
@@ -206,8 +213,8 @@ Remember: output ONLY the JSON schema. No preamble, no explanation.`;
                 tokens_used: totalTokens,
               }).catch(console.error);
 
-              // 4. Update prompt_versions stats
               if (supabaseAdmin) {
+                // 4. Update prompt_versions stats
                 supabaseAdmin
                   .from("prompt_versions")
                   .select("completions, avg_score")
@@ -224,9 +231,52 @@ Remember: output ONLY the JSON schema. No preamble, no explanation.`;
                       .eq("version_name", promptVersion)
                       .then(() => {}, () => {});
                   }, (err) => console.error("[Prompt Stats Update Error]:", err));
+
+                // 5. Persist to Reports table
+                void supabaseAdmin
+                  .from("reports")
+                  .insert({
+                    id: reportId,
+                    session_id: assessmentId,
+                    user_id: userId || null,
+                    score: score,
+                    band: result.band,
+                    component_scores: result.component_scores,
+                    top_3_gaps: result.top_3_gaps,
+                    financial_snapshot: result.financial_snapshot,
+                    team_overview: result.team_overview,
+                    investor_loves: result.investor_loves,
+                    investor_concerns: result.investor_concerns,
+                    action_items: result.action_items,
+                    summary_paragraph: result.summary_paragraph,
+                  })
+                  .then(({ error }) => {
+                    if (error) console.error("[Report Insert Error]:", error);
+                  });
+
+                // 6. Update Session status
+                void supabaseAdmin
+                  .from("sessions")
+                  .update({ status: "completed", completed_at: new Date().toISOString() })
+                  .eq("id", assessmentId)
+                  .then(() => {}, () => {});
               }
 
-              // 5. Fire debate engine (async, non-blocking)
+              // 7. Send Email to User
+              if (userEmail) {
+                resend.emails.send({
+                  from: "FundabilityOS <hello@nextblaze.asia>",
+                  to: userEmail,
+                  subject: `Your Fundability Score is ${score}/100`,
+                  react: DiagnosticCompleteEmail({
+                    score: score,
+                    band: result.band,
+                    reportUrl: reportUrl,
+                  }) as React.ReactElement,
+                }).catch((e) => console.error("[Resend Error]:", e));
+              }
+
+              // 8. Fire debate engine (async, non-blocking)
               fireDebateEngine(assessmentId, answersJson, score);
             }
           } catch (e) {
