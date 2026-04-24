@@ -68,6 +68,29 @@ export default async function ReportPage({ params }: PageProps) {
     }
     reportData = data;
     isUnlocked = data.is_unlocked;
+
+    // ADMIN BYPASS: If logged-in user is admin, they see everything
+    try {
+      const { cookies } = await import("next/headers");
+      const { createServerClient } = await import("@supabase/ssr");
+      const cookieStore = await cookies();
+      const supabaseAuth = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { cookies: { getAll: () => cookieStore.getAll() } }
+      );
+      
+      const { data: { user } } = await supabaseAuth.auth.getUser();
+      if (user) {
+        // Use service role to check admin status without RLS recursion
+        const { data: profile } = await supabase.from("profiles").select("is_admin, role").eq("id", user.id).single();
+        if (profile?.is_admin || profile?.role === 'admin') {
+          isUnlocked = true;
+        }
+      }
+    } catch (e) {
+      console.error("[Report Admin Check Error]:", e);
+    }
   }
 
   return (
