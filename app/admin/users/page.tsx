@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { 
   Users,
   Search, 
@@ -32,7 +31,6 @@ export default function UserManagementPage() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const supabase = createClient();
 
   useEffect(() => {
     fetchUsers();
@@ -40,14 +38,17 @@ export default function UserManagementPage() {
 
   async function fetchUsers() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*, reports(id, score, band, created_at)")
-      .order("created_at", { ascending: false });
-
-    if (data) setUsers(data);
+    try {
+      const res = await fetch("/api/admin/users");
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      setUsers(data.users || []);
+    } catch (err) {
+      console.error("[Admin Users Fetch Error]:", err);
+    }
     setLoading(false);
   }
+
 
   async function deleteUser(id: string) {
     if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
