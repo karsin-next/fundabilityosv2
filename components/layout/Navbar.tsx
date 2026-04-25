@@ -79,6 +79,7 @@ export default function Navbar() {
                 <UserButton afterSignOutUrl="/" />
               </>
             )}
+            {/* HIDDEN FOR NOW
             {isLoaded && !user && (
                <Link
                 href="/sign-in"
@@ -88,6 +89,7 @@ export default function Navbar() {
                 Login
               </Link>
             )}
+            */}
           </div>
         </nav>
       </div>
