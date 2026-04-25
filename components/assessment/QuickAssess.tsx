@@ -8,7 +8,7 @@ import ScoreGaugeMock from "@/components/score/ScoreGaugeMock";
 import type { ScoringResult } from "@/lib/scoring";
 import { useUser } from "@clerk/nextjs";
 
-type InterviewState = "idle" | "loading_question" | "answering" | "scoring" | "done" | "error";
+type InterviewState = "idle" | "loading_question" | "answering" | "collecting_email" | "scoring" | "done" | "error";
 
 interface HistoryItem {
   question: string;
@@ -41,6 +41,8 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
   
   const [scoringResult, setScoringResult] = useState<ScoringResult | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
+  const [extractedData, setExtractedData] = useState<Record<string, unknown> | null>(null);
   const initRendered = useRef(false);
 
   const fetchNextNode = useCallback(async (currentHistory: HistoryItem[]) => {
@@ -100,7 +102,12 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
       const data = JSON.parse(jsonString.replace(/```json/g, "").replace(/```/g, "").trim());
 
       if (data.type === "complete") {
-        runScoring(data.extracted_data);
+        if (!user) {
+          setExtractedData(data.extracted_data);
+          setState("collecting_email");
+        } else {
+          runScoring(data.extracted_data);
+        }
       } else if (data.type === "question") {
         setActiveQuestion({
           title: data.title,
@@ -135,7 +142,7 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
     }
   }, [fetchNextNode]);
 
-  const runScoring = async (structuredData: Record<string, unknown>) => {
+  const runScoring = async (structuredData: Record<string, unknown>, emailOverride?: string) => {
     setState("scoring");
     try {
       const res = await fetch("/api/score", {
@@ -144,7 +151,7 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
         body: JSON.stringify({ 
           answers: structuredData,
           userId: user?.id,
-          userEmail: user?.primaryEmailAddress?.emailAddress || localStorage.getItem("guest_email")
+          userEmail: emailOverride || user?.primaryEmailAddress?.emailAddress
         }),
       });
       if (!res.ok) throw new Error("Analysis failed");
@@ -264,7 +271,26 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
         <ProgressTracker currentDimension={activeQuestion?.dimension} coveredDimensions={coveredDimensions} />
       </div>
 
-      {!activeQuestion ? (
+      {state === "collecting_email" ? (
+        <div style={{ animation: "questionFadeIn 0.4s easeOut" }}>
+          <h3 style={{ color: "var(--white)", fontSize: "1.25rem", marginBottom: "0.5rem", fontWeight: 700 }}>Where should we send your report?</h3>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>Enter your email to receive your full fundability analysis and alpha report.</p>
+          <input 
+            type="email"
+            value={guestEmail}
+            onChange={(e) => setGuestEmail(e.target.value)}
+            placeholder="founder@company.com"
+            style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid var(--yellow-20)", borderRadius: "4px", padding: "0.875rem", color: "white", fontSize: "0.9rem", marginBottom: "1.5rem" }}
+          />
+          <button 
+            disabled={!guestEmail.includes("@")}
+            onClick={() => runScoring(extractedData!, guestEmail)}
+            className="btn btn-primary w-full"
+          >
+            Generate My Report <ArrowRight size={14} />
+          </button>
+        </div>
+      ) : !activeQuestion ? (
         <div style={{ textAlign: "center", padding: "3rem 0" }}>
           <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "2px solid var(--yellow-20)", borderTopColor: "var(--yellow)", animation: "spin 1s linear infinite", marginInline: "auto", marginBottom: "1rem" }} />
           <p style={{ color: "var(--yellow)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>AI is thinking...</p>

@@ -115,21 +115,7 @@ export async function POST(req: NextRequest) {
             let finalUserId = userId;
             if (!finalUserId && userEmail) {
               const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("email", userEmail).single();
-              if (profile) {
-                finalUserId = profile.id;
-              } else {
-                // Create a guest profile
-                const guestId = `guest_${crypto.randomUUID()}`;
-                const { data: newProfile, error: profileErr } = await supabaseAdmin.from("profiles").insert({
-                  id: guestId,
-                  email: userEmail,
-                  full_name: "Guest User",
-                }).select().single();
-                
-                if (newProfile) {
-                  finalUserId = newProfile.id;
-                }
-              }
+              if (profile) finalUserId = profile.id;
             }
 
             // 2. Save Session & Report (SEQUENTIAL)
@@ -156,35 +142,54 @@ export async function POST(req: NextRequest) {
               full_json: result
             });
 
-            // 3. BACKGROUND TASKS (Non-blocking)
+            // 3. BACKGROUND TASKS (Each isolated so one failure doesn't kill the rest)
+            // -- Telegram --
             (async () => {
               try {
-                // Telegram
-                const tgMessage = `🚀 <b>Diagnostic Completed</b>\n\nUser: ${userEmail || "anonymous@user.com"}\nScore: ${score} (${result.band})\nReport: ${reportUrl}`;
-                await sendTelegramAlert(tgMessage);
+                await sendTelegramAlert({
+                  type: "diagnostic_completed",
+                  user_email: userEmail || "anonymous@user.com",
+                  score,
+                  band: result.band,
+                  report_url: reportUrl
+                });
+              } catch (e) {
+                console.error("[BG Telegram Error]:", e);
+              }
+            })();
 
-                // Email
+            // -- Email --
+            (async () => {
+              try {
                 if (userEmail) {
-                  const { data: emailData, error: emailError } = await resend.emails.send({
+                  const { error: emailError } = await resend.emails.send({
                     from: process.env.RESEND_FROM_EMAIL || "FundabilityOS <hello@nextblaze.asia>",
                     to: userEmail,
                     subject: `Your Fundability Score is ${score}/100`,
                     react: DiagnosticCompleteEmail({ score, band: result.band, reportUrl }) as React.ReactElement,
                   });
                   if (emailError) console.error("[Resend Error]:", emailError);
+                  else console.log("[Resend] Email sent to:", userEmail);
+                } else {
+                  console.warn("[Resend] No userEmail provided, skipping email.");
                 }
+              } catch (e) {
+                console.error("[BG Email Error]:", e);
+              }
+            })();
 
-                // Analytics
+            // -- Analytics & Debate --
+            (async () => {
+              try {
                 await trackEvent("assessment_completed", { sessionId: assessmentId, score, userId: finalUserId });
                 await logInteraction({
                   assessment_id: assessmentId,
                   final_output: result,
                   tokens_used: 0
                 });
-                
                 fireDebateEngine(assessmentId, answersJson, score);
-              } catch (bgErr) {
-                console.error("[BG Tasks Error]:", bgErr);
+              } catch (e) {
+                console.error("[BG Analytics Error]:", e);
               }
             })();
           }
