@@ -115,7 +115,21 @@ export async function POST(req: NextRequest) {
             let finalUserId = userId;
             if (!finalUserId && userEmail) {
               const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("email", userEmail).single();
-              if (profile) finalUserId = profile.id;
+              if (profile) {
+                finalUserId = profile.id;
+              } else {
+                // Create a guest profile
+                const guestId = `guest_${crypto.randomUUID()}`;
+                const { data: newProfile, error: profileErr } = await supabaseAdmin.from("profiles").insert({
+                  id: guestId,
+                  email: userEmail,
+                  full_name: "Guest User",
+                }).select().single();
+                
+                if (newProfile) {
+                  finalUserId = newProfile.id;
+                }
+              }
             }
 
             // 2. Save Session & Report (SEQUENTIAL)
@@ -146,13 +160,8 @@ export async function POST(req: NextRequest) {
             (async () => {
               try {
                 // Telegram
-                await sendTelegramAlert({
-                  type: "diagnostic_completed",
-                  user_email: userEmail || "anonymous@user.com",
-                  score,
-                  band: result.band,
-                  report_url: reportUrl
-                });
+                const tgMessage = `🚀 <b>Diagnostic Completed</b>\n\nUser: ${userEmail || "anonymous@user.com"}\nScore: ${score} (${result.band})\nReport: ${reportUrl}`;
+                await sendTelegramAlert(tgMessage);
 
                 // Email
                 if (userEmail) {
