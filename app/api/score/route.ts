@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
         { status: 429, headers: { "X-RateLimit-Limit": String(limit), "X-RateLimit-Reset": String(reset) } }
       );
     }
-
     const { answers, sessionId, userId, userEmail } = await req.json();
     const assessmentId = sessionId || crypto.randomUUID();
     const answersJson = JSON.stringify(answers);
