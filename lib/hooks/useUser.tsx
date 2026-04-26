@@ -32,16 +32,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getInitialUser();
 
     // 2. Aggressive Catch for hash-based logins (Implicit Flow)
-    // If we land on any page with #access_token, Supabase's client-side library 
-    // will process it, but we need to force the redirect to dashboard.
     if (typeof window !== "undefined" && window.location.hash.includes("access_token")) {
-      console.log("[Auth] Token detected in hash, waiting for session...");
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          console.log("[Auth] Session found, forcing dashboard redirect");
-          window.location.href = "/dashboard";
-        }
-      });
+      console.log("[Auth] Token detected in hash, executing manual session set...");
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+
+      if (accessToken && refreshToken) {
+        // Force the session directly
+        supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        }).then(({ data, error }) => {
+          if (!error && data.session) {
+            console.log("[Auth] Manual session set successful. Redirecting...");
+            // Sync cookies for middleware before redirecting
+            fetch("/api/auth/callback?sync=true").then(() => {
+              window.location.href = "/dashboard";
+            });
+          }
+        });
+      }
     }
 
     // 3. Listen for auth changes and sync cookies
@@ -54,8 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Sync cookies for middleware
         await fetch("/api/auth/callback?sync=true");
         
-        // If we are on the login page or have a hash, go to dashboard
-        if (window.location.pathname === "/login" || window.location.hash) {
+        // If we are on the login page, go to dashboard
+        if (window.location.pathname === "/login") {
           window.location.href = "/dashboard";
         }
       }
@@ -64,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         window.location.href = "/";
       }
     });
+
 
     return () => {
       subscription.unsubscribe();
