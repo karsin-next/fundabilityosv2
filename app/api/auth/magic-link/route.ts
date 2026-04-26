@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     console.log("[Magic Link Generated]:", magicLink);
 
     // 2. Send the email via Resend
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "hello@nextblaze.asia";
     const { error: resendError } = await resend.emails.send({
       from: `FundabilityOS <${fromEmail}>`,
       to: [email],
