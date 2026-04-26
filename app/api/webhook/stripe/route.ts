@@ -75,10 +75,10 @@ export async function POST(req: Request) {
       const customerEmail = session.customer_details?.email;
       if (customerEmail) {
         await resend.emails.send({
-          from: "FundabilityOS <karsin@nextblaze.asia>",
+          from: process.env.RESEND_FROM_EMAIL || "FundabilityOS <hello@nextblaze.asia>",
           to: customerEmail,
           subject: "Your Investor-Ready Report is Unlocked",
-          react: ReportUnlockedEmail({ reportUrl }),
+          react: ReportUnlockedEmail({ reportUrl }) as React.ReactElement,
         });
         console.log(`Delivery email sent to ${customerEmail}`);
       }

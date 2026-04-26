@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
+import { Menu, X, LayoutDashboard, Home, Rocket, Info, Briefcase } from "lucide-react";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,11 +39,11 @@ export default function Navbar() {
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden text-[#ffd800] text-3xl focus:outline-none"
+          className="md:hidden text-[#ffd800] p-2 focus:outline-none hover:bg-white/5 transition-colors"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
-          ☰
+          {menuOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
 
         {/* Nav links */}
@@ -50,46 +51,37 @@ export default function Navbar() {
           ${menuOpen ? "flex" : "hidden"}
           md:flex flex-col md:flex-row absolute md:relative top-full left-0 w-full md:w-auto
           bg-[#022f42] md:bg-transparent border-t-2 border-[#ffd800] md:border-none
-          py-8 md:py-0 md:pl-8 items-center gap-6 md:gap-8 transition-all shadow-lg md:shadow-none
+          py-10 md:py-0 md:pl-8 items-center gap-8 md:gap-10 transition-all shadow-2xl md:shadow-none
         `}>
-          <Link href="/" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
-            Home
+          <Link href="/" onClick={() => setMenuOpen(false)} className="nav-link flex items-center gap-2">
+            <Home size={14} className="md:hidden" /> Home
           </Link>
-          <Link href="/#impact" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
-            Impact
+          <Link href="/#impact" onClick={() => setMenuOpen(false)} className="nav-link flex items-center gap-2">
+            <Rocket size={14} className="md:hidden" /> Impact
           </Link>
-          <Link href="/#cases" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
-            Case Studies
-          </Link>
-
-          <Link href="/methodology" onClick={() => setMenuOpen(false)} className="text-white/90 hover:text-[#ffd800] font-bold text-sm uppercase tracking-widest border-b-2 border-transparent hover:border-[#ffd800] transition-all pb-1">
-            Methodology
+          <Link href="/#cases" onClick={() => setMenuOpen(false)} className="nav-link flex items-center gap-2">
+            <Briefcase size={14} className="md:hidden" /> Case Studies
           </Link>
 
-          <div className="flex items-center gap-4 ml-0 md:ml-4 flex-col md:flex-row mt-4 md:mt-0">
+          <Link href="/methodology" onClick={() => setMenuOpen(false)} className="nav-link flex items-center gap-2">
+            <Info size={14} className="md:hidden" /> Methodology
+          </Link>
+
+          <div className="flex items-center gap-6 ml-0 md:ml-4 flex-col md:flex-row mt-6 md:mt-0 w-full md:w-auto px-6 md:px-0">
             {isLoaded && user && (
               <>
                 <Link
                   href="/dashboard"
                   onClick={() => setMenuOpen(false)}
-                  className="bg-[#ffd800] border-2 border-[#ffd800] text-[#022f42] hover:bg-transparent hover:text-[#ffd800] px-6 py-2 font-bold text-sm uppercase tracking-widest transition-all text-center shadow-md"
+                  className="btn btn-primary w-full md:w-auto shadow-[0_10px_20px_-5px_rgba(255,216,0,0.3)]"
                 >
-                  Dashboard
+                  <LayoutDashboard size={16} /> Dashboard
                 </Link>
-                <UserButton afterSignOutUrl="/" />
+                <div className="bg-white/10 p-1.5 rounded-full border border-white/10">
+                  <UserButton afterSignOutUrl="/" />
+                </div>
               </>
             )}
-            {/* HIDDEN FOR NOW
-            {isLoaded && !user && (
-               <Link
-                href="/sign-in"
-                onClick={() => setMenuOpen(false)}
-                className="bg-[#ffd800] border-2 border-[#ffd800] text-[#022f42] hover:bg-transparent hover:text-[#ffd800] px-6 py-2 font-bold text-sm uppercase tracking-widest transition-all text-center shadow-md"
-              >
-                Login
-              </Link>
-            )}
-            */}
           </div>
         </nav>
       </div>

@@ -612,3 +612,34 @@ body {
   .result-header-grid { grid-template-columns: 1fr !important; }
   .result-body-grid   { grid-template-columns: 1fr !important; }
 }
+
+/* ============================================================
+   ASSESSMENT OPTIONS (TOUCH TARGETS)
+   ============================================================ */
+
+.assess-option {
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--yellow-20);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px; /* Touch target accessibility */
+}
+
+.assess-option:hover {
+  background: var(--yellow-10);
+  border-color: var(--yellow);
+  transform: translateX(4px);
+}
+
+.assess-option:active {
+  background: var(--yellow-20);
+  transform: scale(0.98);
+}
+

@@ -3,6 +3,8 @@ import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { sendTelegramAlert } from '@/lib/telegram';
+import { resend } from '@/lib/resend';
+import { WelcomeEmail } from '@/components/emails/WelcomeEmail';
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
@@ -84,6 +86,18 @@ export async function POST(req: Request) {
           band: `New user: ${fullName || email}`,
           report_url: `https://supabase.com/dashboard/project/${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(".")[0]}/editor/public/profiles`
         });
+
+        // Send Welcome Email
+        try {
+          await resend.emails.send({
+            from: process.env.RESEND_FROM_EMAIL || "FundabilityOS <hello@nextblaze.asia>",
+            to: email,
+            subject: "Welcome to FundabilityOS",
+            react: WelcomeEmail({ userName: fullName || email }) as React.ReactElement,
+          });
+        } catch (emailErr) {
+          console.error('[Clerk Webhook] Error sending welcome email:', emailErr);
+        }
       }
 
       console.log(`[Clerk Webhook] Successfully synced profile for user ${id}`);
