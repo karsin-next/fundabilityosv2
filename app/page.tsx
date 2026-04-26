@@ -385,13 +385,23 @@ export default function HomePage() {
                   className="animate-fade-in-up delay-300"
                   style={{ display: "flex", gap: "1.25rem", alignItems: "center", marginTop: "1rem", justifyContent: scoringResult ? "center" : "flex-start" }}
                 >
-                  <button onClick={() => { setShowAssessment(true); setShowUpload(false); }} className="btn btn-primary btn-lg shadow-[0_20px_40px_-10px_rgba(255,216,0,0.3)]">
-                    Start Diagnostic
-                    <ArrowRight size={16} />
-                  </button>
-                  <button onClick={() => { setShowUpload(true); setShowAssessment(false); }} className="btn btn-ghost border-white/20 hover:border-white/50 text-white hover:text-white px-6">
-                    <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
-                  </button>
+                  {user ? (
+                    <Link href="/dashboard" className="btn btn-primary btn-lg shadow-[0_20px_40px_-10px_rgba(255,216,0,0.3)]">
+                      Go to Dashboard
+                      <LayoutDashboard className="w-4 h-4" />
+                    </Link>
+                  ) : (
+                    <button onClick={() => { setShowAssessment(true); setShowUpload(false); }} className="btn btn-primary btn-lg shadow-[0_20px_40px_-10px_rgba(255,216,0,0.3)]">
+                      Start Diagnostic
+                      <ArrowRight size={16} />
+                    </button>
+                  )}
+                  
+                  {!user && (
+                    <button onClick={() => { setShowUpload(true); setShowAssessment(false); }} className="btn btn-ghost border-white/20 hover:border-white/50 text-white hover:text-white px-6">
+                      <Database className="w-4 h-4 mr-2" /> Pitchdeck Upload
+                    </button>
+                  )}
                 </div>
               )}
 
