@@ -31,21 +31,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getInitialUser();
 
-    // 2. Listen for auth changes and sync cookies
+    // 2. Aggressive Catch for hash-based logins (Implicit Flow)
+    // If we land on any page with #access_token, Supabase's client-side library 
+    // will process it, but we need to force the redirect to dashboard.
+    if (typeof window !== "undefined" && window.location.hash.includes("access_token")) {
+      console.log("[Auth] Token detected in hash, waiting for session...");
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          console.log("[Auth] Session found, forcing dashboard redirect");
+          window.location.href = "/dashboard";
+        }
+      });
+    }
+
+    // 3. Listen for auth changes and sync cookies
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("[Auth Change Event]:", event);
       setUser(session?.user ?? null);
       setIsLoaded(true);
 
-      // CRITICAL: When the session changes (Login/Logout), we MUST ensure 
-      // the server-side cookies are updated. This tells the Middleware we are logged in.
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // This is a "No-Op" fetch that just triggers the middleware to see the new cookies
-        // which Supabase's client sets automatically in the browser.
+        // Sync cookies for middleware
         await fetch("/api/auth/callback?sync=true");
         
-        // If we have a hash (Implicit Flow), redirect to dashboard now that cookies are synced
-        if (window.location.hash) {
+        // If we are on the login page or have a hash, go to dashboard
+        if (window.location.pathname === "/login" || window.location.hash) {
           window.location.href = "/dashboard";
         }
       }
