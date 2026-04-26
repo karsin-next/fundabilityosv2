@@ -14,19 +14,14 @@ export async function POST(req: NextRequest) {
 
     // 1. Generate the magic link using Supabase Admin
     // We force the redirectTo to our callback endpoint so we can handle cookie exchange
-    // Use the origin from the request to ensure consistency (www vs non-www)
     const origin = req.nextUrl.origin;
-    // Construct an absolute callback URL
     const callbackUrl = `${origin}/api/auth/callback`;
-    const finalDestination = redirectTo || "/dashboard";
     
-    console.log("[Magic Link] Attempting to generate link with redirectTo:", `${callbackUrl}?redirect=${encodeURIComponent(finalDestination)}`);
-
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: "magiclink",
       email,
       options: {
-        redirectTo: `${callbackUrl}?redirect=${encodeURIComponent(finalDestination)}`,
+        redirectTo: callbackUrl,
       },
     });
 

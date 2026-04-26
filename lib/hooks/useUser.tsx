@@ -32,9 +32,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getInitialUser();
 
     // 2. Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[Auth Change]:", event, session?.user?.email);
       setUser(session?.user ?? null);
       setIsLoaded(true);
+
+      // If we just signed in via a fragment/hash, the cookies might not be set yet for the server.
+      // A quick refresh or redirect to dashboard will trigger the middleware to see the new state.
+      if (event === "SIGNED_IN" && window.location.hash) {
+        window.location.href = "/dashboard";
+      }
     });
 
     return () => {
