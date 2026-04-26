@@ -2,6 +2,7 @@ import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { sendTelegramAlert } from '@/lib/telegram';
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
@@ -73,6 +74,16 @@ export async function POST(req: Request) {
       if (error) {
         console.error('[Clerk Webhook] Error upserting profile:', error.message);
         return new Response('Error upserting profile', { status: 500 });
+      }
+
+      // Send Telegram alert for NEW users
+      if (eventType === 'user.created') {
+        await sendTelegramAlert({
+          type: "new_user_signup",
+          user_email: email,
+          band: `New user: ${fullName || email}`,
+          report_url: `https://supabase.com/dashboard/project/${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(".")[0]}/editor/public/profiles`
+        });
       }
 
       console.log(`[Clerk Webhook] Successfully synced profile for user ${id}`);

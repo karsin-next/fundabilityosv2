@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 export const maxDuration = 120; // Generous timeout — runs async, not user-blocking
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sendTelegramAlert } from "@/lib/telegram";
 
 interface DebateRequest {
   assessment_id: string;
@@ -123,6 +124,14 @@ Be blunt, precise, and cite specific deficiencies from the founder's answers. Ma
         (bearMsg.usage?.output_tokens || 0) +
         (arbiterMsg.usage?.input_tokens || 0) +
         (arbiterMsg.usage?.output_tokens || 0),
+    });
+
+    // ── Send Telegram Notification ────────────────────────────────────────────
+    await sendTelegramAlert({
+      type: "investor_feedback_ready",
+      score: arbiterOutput.score,
+      band: `Delta from original: ${deltaFromPrimary > 0 ? "+" : ""}${deltaFromPrimary}`,
+      report_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
     });
 
     return NextResponse.json({
