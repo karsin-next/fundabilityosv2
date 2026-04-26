@@ -14,7 +14,8 @@ import React from "react";
 export async function GET(request: NextRequest) {
   console.log("[Auth Callback] [TOP] Request received at:", request.url);
   const { searchParams } = new URL(request.url);
-  const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
+  const requestUrl = new URL(request.url);
+  const origin = requestUrl.origin;
   
   const code = searchParams.get("code");
   const redirectTo = searchParams.get("redirect") || "/dashboard";
