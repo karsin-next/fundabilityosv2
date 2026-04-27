@@ -7,6 +7,7 @@ import ProgressTracker from "@/components/chat/ProgressTracker";
 import ScoreGaugeMock from "@/components/score/ScoreGaugeMock";
 import type { ScoringResult } from "@/lib/scoring";
 import { useUser } from "@/lib/hooks/useUser";
+import { createClient } from "@/lib/supabase/client";
 
 type InterviewState = "idle" | "loading_question" | "answering" | "collecting_email" | "scoring" | "done" | "error";
 
@@ -274,7 +275,9 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
       {state === "collecting_email" ? (
         <div style={{ animation: "questionFadeIn 0.4s easeOut" }}>
           <h3 style={{ color: "var(--white)", fontSize: "1.25rem", marginBottom: "0.5rem", fontWeight: 700 }}>Where should we send your report?</h3>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>Enter your email to receive your full fundability analysis and alpha report.</p>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+            Enter your email to receive your full fundability analysis. <strong>This will also create your account</strong> so you can access your private dashboard via magic link.
+          </p>
           <input 
             type="email"
             value={guestEmail}
@@ -284,11 +287,24 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
           />
           <button 
             disabled={!guestEmail.includes("@")}
-            onClick={() => runScoring(extractedData!, guestEmail)}
+            onClick={() => {
+              // Trigger magic link in background
+              const supabase = createClient();
+              supabase.auth.signInWithOtp({ 
+                email: guestEmail,
+                options: {
+                  emailRedirectTo: window.location.origin + "/dashboard"
+                }
+              });
+              runScoring(extractedData!, guestEmail);
+            }}
             className="btn btn-primary w-full"
           >
-            Generate My Report <ArrowRight size={14} />
+            Generate My Report & Save Results <ArrowRight size={14} />
           </button>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.75rem", marginTop: "1rem", textAlign: "center" }}>
+            No password needed. Check your inbox for a secure login link.
+          </p>
         </div>
       ) : !activeQuestion ? (
         <div style={{ textAlign: "center", padding: "3rem 0" }}>

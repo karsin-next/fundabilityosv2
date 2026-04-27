@@ -3,7 +3,7 @@
 import { 
   Target, Users, ShieldCheck, 
   TrendingUp, Globe, BarChart3, ChevronRight, CheckCircle2, PlayCircle, ClipboardList, ArrowRight,
-  AlertTriangle, RefreshCw, Zap, AlertCircle
+  AlertTriangle, RefreshCw, Zap, AlertCircle, Banknote, DollarSign, HeartHandshake, Lightbulb, Swords, Package
 } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/lib/hooks/useUser";
@@ -12,14 +12,16 @@ import { createClient } from "@/lib/supabase/client";
 import { TractionTracker } from "@/components/dashboard/TractionTracker";
 
 const subModules = [
-  { id: "1-problem", title: "The Problem Diagnostic", icon: Target, desc: "Are you solving a real, painful problem?", status: "not_started", time: "3 min" },
-  { id: "2-customer", title: "Customer Clarity Scan", icon: Users, desc: "Who exactly is your early adopter?", status: "not_started", time: "4 min" },
-  { id: "3-competitor", title: "Competitive Positioning", icon: ShieldCheck, desc: "Where is your white space?", status: "not_started", time: "5 min" },
-  { id: "4-product", title: "Product Readiness", icon: PlayCircle, desc: "Stage of development & uniqueness.", status: "not_started", time: "2 min" },
-  { id: "5-market", title: "Market Opportunity Sizer", icon: Globe, desc: "TAM/SAM/SOM and timing.", status: "not_started", time: "4 min" },
-  { id: "6-pmf", title: "Product-Market Fit Probe", icon: TrendingUp, desc: "Vitamin vs. Painkiller analysis.", status: "not_started", time: "3 min" },
-  { id: "7-revenue", title: "Revenue Model Explorer", icon: BarChart3, desc: "Pricing power and margins.", status: "not_started", time: "4 min" },
-  { id: "8-team", title: "Team Composition Audit", icon: Users, desc: "Founding team strength and gaps.", status: "not_started", time: "3 min" },
+  { id: "1-problem",     title: "1.1.1 Problem & Hypothesis",          icon: Lightbulb,     desc: "Are you solving a real, painful problem?",          status: "not_started", time: "3 min" },
+  { id: "2-customer",    title: "1.1.2 Customer Persona",               icon: Users,         desc: "Who exactly is your early adopter?",                status: "not_started", time: "4 min" },
+  { id: "3-competitor",  title: "1.1.3 Competitor Analysis",            icon: Swords,        desc: "Where is your white space?",                        status: "not_started", time: "5 min" },
+  { id: "4-product",     title: "1.1.4 Product Readiness",              icon: Package,       desc: "Stage of development & uniqueness.",                status: "not_started", time: "2 min" },
+  { id: "5-market",      title: "1.1.5 Market Opportunity",             icon: Globe,         desc: "TAM/SAM/SOM and timing.",                           status: "not_started", time: "4 min" },
+  { id: "6-pmf",         title: "1.1.6 Product-Market Fit & Traction",  icon: TrendingUp,    desc: "Vitamin vs. Painkiller analysis.",                  status: "not_started", time: "3 min" },
+  { id: "7-revenue",     title: "1.1.7 Revenue Model Explorer",         icon: DollarSign,    desc: "Pricing power and margins.",                        status: "not_started", time: "4 min" },
+  { id: "8-team",        title: "1.1.8 Team Composition Audit",         icon: HeartHandshake,desc: "Founding team strength and gaps.",                  status: "not_started", time: "3 min" },
+  { id: "9-financial",   title: "1.1.9 Financial Snapshot",             icon: Banknote,      desc: "MRR, burn, cash balance & runway.",                 status: "not_started", time: "4 min" },
+  { id: "10-fundraising",title: "1.1.10 Fundraising Ask",               icon: Target,        desc: "Raise amount, use-of-funds & close date.",          status: "not_started", time: "3 min" },
 ];
 
 export default function AuditHubPage() {
@@ -234,7 +236,7 @@ export default function AuditHubPage() {
           <div className="w-3 h-3 bg-red-500 animate-pulse" />
           Institutional Due Diligence Gates
         </h2>
-        <div className="text-[10px] font-bold text-[#022f42]/40 uppercase tracking-[0.2em]">8 MANDATORY GATES</div>
+        <div className="text-[10px] font-bold text-[#022f42]/40 uppercase tracking-[0.2em]">10 MANDATORY GATES</div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-20">
