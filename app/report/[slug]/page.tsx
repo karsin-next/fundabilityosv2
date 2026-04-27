@@ -114,7 +114,7 @@ export default async function ReportPage({ params }: PageProps) {
 
       <div className="container" style={{ marginTop: "3rem" }}>
         <div style={{ position: "relative" }}>
-          <div style={{ filter: isUnlocked ? "none" : "blur(10px)", pointerEvents: isUnlocked ? "auto" : "none", opacity: isUnlocked ? 1 : 0.4 }}>
+          <div style={{ filter: "none", pointerEvents: "auto", opacity: 1 }}>
             
             <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "2.5rem", alignItems: "start" }} className="report-grid">
               <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
@@ -197,27 +197,25 @@ export default async function ReportPage({ params }: PageProps) {
               </div>
             </div>
 
-          </div>
-
-          {/* LOCK OVERLAY IF NOT PAID */}
-          {!isUnlocked && (
-            <div className="lock-overlay" style={{ flexDirection: "column", background: "linear-gradient(to bottom, transparent, var(--off-white) 60%)" }}>
-              <div style={{ backgroundColor: "white", padding: "3rem", borderRadius: "8px", boxShadow: "0 20px 40px rgba(2,47,66,0.15)", maxWidth: "420px", textAlign: "center" }}>
+            {/* UNLOCK SECTION AT THE END IF NOT PAID */}
+            {!isUnlocked && (
+              <div style={{ marginTop: "4rem", textAlign: "center", padding: "4rem 2rem", backgroundColor: "white", border: "4px solid var(--amber)", borderRadius: "8px", boxShadow: "0 20px 40px rgba(2,47,66,0.1)" }}>
                 <div style={{ width: "64px", height: "64px", backgroundColor: "var(--navy)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginInline: "auto", marginBottom: "1.5rem" }}>
                   <Lock size={28} color="var(--yellow)" />
                 </div>
-                <h3 className="heading-card" style={{ fontSize: "1.25rem" }}>Unlock Your Full Report</h3>
-                <p style={{ fontSize: "0.85rem", color: "rgba(2,47,66,0.6)", margin: "1rem 0 2rem", lineHeight: 1.6 }}>
-                  See exactly what investors will push back on. Get your Custom 30-Day Growth Plan and permanent shareable link.
+                <h3 className="heading-card" style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>Unlock Your Full Audit & Permanent Link</h3>
+                <p style={{ fontSize: "1rem", color: "rgba(2,47,66,0.7)", maxWidth: "500px", marginInline: "auto", marginBottom: "2.5rem", lineHeight: 1.6 }}>
+                  See exactly what investors will push back on. Secure your permanent shareable URL and detailed 30-Day Growth Plan.
                 </p>
-                <UnlockButton reportId={reportData.id} />
-                <p style={{ fontSize: "0.7rem", color: "rgba(2,47,66,0.4)", marginTop: "1rem" }}>
-                  One-time payment of $29. Secured by Stripe.
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                   <UnlockButton reportId={reportData.id} />
+                </div>
+                <p style={{ fontSize: "0.75rem", color: "rgba(2,47,66,0.4)", marginTop: "1.5rem", fontWeight: 600 }}>
+                  ONE-TIME PAYMENT OF $29. SECURED BY STRIPE.
                 </p>
               </div>
-            </div>
-          )}
-
+            )}
+          </div>
         </div>
       </div>
     </div>
