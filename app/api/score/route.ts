@@ -111,11 +111,28 @@ export async function POST(req: NextRequest) {
               : "http://localhost:3000");
             const reportUrl = `${baseUrl}/report/${reportId}`;
 
-            // 1. Resolve User ID (Smart Link)
+            // 1. Resolve User ID (Smart Link) & Auto-Create Profile
             let finalUserId = userId;
             if (!finalUserId && userEmail) {
+              // Try to find existing profile by email
               const { data: profile } = await supabaseAdmin.from("profiles").select("id").eq("email", userEmail).single();
-              if (profile) finalUserId = profile.id;
+              if (profile) {
+                finalUserId = profile.id;
+              } else {
+                // Try to find auth user by email and create profile
+                const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers();
+                const authUser = authUsers?.users?.find((u: any) => u.email === userEmail);
+                if (authUser) {
+                  await supabaseAdmin.from("profiles").upsert({
+                    id: authUser.id,
+                    email: userEmail,
+                    full_name: authUser.user_metadata?.full_name || "",
+                    role: "startup",
+                  });
+                  finalUserId = authUser.id;
+                  console.log(`[Score] Auto-created profile for ${userEmail}`);
+                }
+              }
             }
 
             // 2. Save Session & Report (SEQUENTIAL)
@@ -146,12 +163,13 @@ export async function POST(req: NextRequest) {
             // -- Telegram --
             (async () => {
               try {
+                const adminUrl = `${baseUrl}/admin/users?email=${encodeURIComponent(userEmail || "anonymous@user.com")}`;
                 await sendTelegramAlert({
                   type: "diagnostic_completed",
                   user_email: userEmail || "anonymous@user.com",
                   score,
                   band: result.band,
-                  report_url: reportUrl
+                  report_url: adminUrl
                 });
               } catch (e) {
                 console.error("[BG Telegram Error]:", e);

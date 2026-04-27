@@ -151,7 +151,7 @@ export default function QuickAssess({ onComplete, isEmbedded = false }: Props) {
         body: JSON.stringify({ 
           answers: structuredData,
           userId: user?.id,
-          userEmail: emailOverride || user?.primaryEmailAddress?.emailAddress
+          userEmail: emailOverride || user?.email
         }),
       });
       if (!res.ok) throw new Error("Analysis failed");

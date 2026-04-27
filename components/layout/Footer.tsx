@@ -11,6 +11,7 @@ const footerLinks = {
     { href: "/privacy", label: "Privacy Policy" },
     { href: "mailto:karsin@nextblaze.asia", label: "Contact" },
     { href: "https://nextblaze.asia", label: "NextBlaze" },
+    { href: "/donate", label: "Support Us / Donate" },
   ],
 };
 

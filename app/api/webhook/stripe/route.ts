@@ -29,7 +29,34 @@ export async function POST(req: Request) {
 
   // Handle successful checkout
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
+    const session = event.data.object as any;
+
+    // Process Donation
+    if (session.metadata?.is_donation === "true") {
+      try {
+        if (!supabaseAdmin) throw new Error("Supabase not configured locally.");
+        
+        await supabaseAdmin.from("donations").insert({
+          user_id: session.metadata.user_id !== "anonymous" ? session.metadata.user_id : null,
+          amount_cents: session.amount_total,
+          currency: session.currency || "usd",
+          stripe_session_id: session.id,
+          stripe_payment_intent: typeof session.payment_intent === "string" ? session.payment_intent : null,
+          donor_name: session.metadata.donor_name || null,
+          donor_message: session.metadata.donor_message || null,
+        });
+
+        console.log(`Donation of ${session.amount_total} cents recorded.`);
+        
+        await sendTelegramAlert(`💖 <b>New Donation!</b>\nAmount: $${((session.amount_total || 0) / 100).toFixed(2)}\nFrom: ${session.metadata.donor_name || "Anonymous"}\nMessage: ${session.metadata.donor_message || "None"}`);
+        
+        return NextResponse.json({ received: true });
+      } catch (err) {
+        console.error("Donation processing failed", err);
+        return NextResponse.json({ error: "Donation fulfillment failed" }, { status: 500 });
+      }
+    }
+
     const reportId = session.metadata?.report_id;
     const userId = session.metadata?.user_id;
 

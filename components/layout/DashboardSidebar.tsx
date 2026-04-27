@@ -405,8 +405,16 @@ export function DashboardSidebar() {
         </nav>
       </div>
 
-      {/* Logout Button */}
-      <div className="mt-auto p-4 border-t border-[#1b4f68]/50">
+      <div className="mt-auto p-4 border-t border-[#1b4f68]/50 space-y-2">
+        {/* Support Us Button */}
+        <Link 
+          href="/donate"
+          className="w-full bg-[#ffd800] hover:bg-[#ffd800]/90 text-[#022f42] transition-colors rounded-sm py-2.5 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-sm hover:shadow-md"
+        >
+          <HeartHandshake className="w-4 h-4" /> Support Us
+        </Link>
+        
+        {/* Logout Button */}
         <button 
           onClick={async () => {
             await signOut();

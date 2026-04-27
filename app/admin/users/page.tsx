@@ -1,36 +1,51 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, RefreshCw, CheckCircle, XCircle, Send, ExternalLink } from "lucide-react";
+import { Users, RefreshCw, CheckCircle, XCircle, Send, ExternalLink, FileText } from "lucide-react";
 
 interface UserProfile {
   id: string;
   email: string;
   full_name: string;
   company_name: string;
+  is_admin: boolean;
   role: string;
   created_at: string;
   fundability_score: number | null;
+  band: string | null;
+  report_id: string | null;
+  assessment_date: string | null;
+}
+
+interface OrphanReport {
+  id: string;
+  score: number;
+  band: string;
+  created_at: string;
 }
 
 /**
  * Admin Users Page (/admin/users)
- * Displays all registered users from the Supabase profiles table.
+ * Displays all registered users from the Supabase profiles table,
+ * joined with their latest assessment scores.
  * Accessible at /admin/users?secret=YOUR_CRON_SECRET
  */
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [orphanReports, setOrphanReports] = useState<OrphanReport[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [secret, setSecret] = useState("");
   const [authed, setAuthed] = useState(false);
   const [secretInput, setSecretInput] = useState("");
+  const [highlightEmail, setHighlightEmail] = useState<string | null>(null);
   const [telegramStatus, setTelegramStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
 
   useEffect(() => {
-    // Pre-fill secret from query param on load
     const params = new URLSearchParams(window.location.search);
     const s = params.get("secret") || "";
+    const email = params.get("email") || null;
+    if (email) setHighlightEmail(email);
     if (s) {
       setSecret(s);
       setAuthed(true);
@@ -48,6 +63,7 @@ export default function AdminUsersPage() {
       if (!res.ok) throw new Error("Unauthorized or server error");
       const data = await res.json();
       setUsers(data.users || []);
+      setOrphanReports(data.orphan_reports || []);
       setTotal(data.total || 0);
     } catch (e) {
       console.error(e);
@@ -78,11 +94,11 @@ export default function AdminUsersPage() {
     fetchUsers(secretInput);
   }
 
-  function getScoreBadge(score: number | null) {
+  function getScoreBadge(score: number | null, band: string | null) {
     if (!score) return <span className="px-2 py-0.5 text-[10px] font-bold bg-gray-100 text-gray-500 rounded">No Score</span>;
-    if (score >= 85) return <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-700 rounded">{score} ✅</span>;
-    if (score >= 60) return <span className="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-700 rounded">{score} ⚠️</span>;
-    return <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 rounded">{score} 🔴</span>;
+    if (score >= 85) return <span className="px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-700 rounded">{score} · {band || "✅"}</span>;
+    if (score >= 60) return <span className="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-700 rounded">{score} · {band || "⚠️"}</span>;
+    return <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-700 rounded">{score} · {band || "🔴"}</span>;
   }
 
   // ── Auth gate ──────────────────────────────────────────────────────────────
@@ -166,10 +182,7 @@ export default function AdminUsersPage() {
             { label: "Total Users", value: total },
             { label: "With Scores", value: users.filter(u => u.fundability_score).length },
             { label: "High Scores (85+)", value: users.filter(u => (u.fundability_score ?? 0) >= 85).length },
-            { label: "New (7 days)", value: users.filter(u => {
-              const days = (Date.now() - new Date(u.created_at).getTime()) / 86400000;
-              return days <= 7;
-            }).length },
+            { label: "Guest Reports", value: orphanReports.length },
           ].map((stat) => (
             <div key={stat.label} className="bg-white border-2 border-[#022f42]/5 p-6 shadow-sm">
               <div className="text-3xl font-black text-[#022f42] mb-1">{stat.value}</div>
@@ -196,30 +209,90 @@ export default function AdminUsersPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[#022f42]/3 border-b border-[#022f42]/5">
-                    {["#", "Name", "Email", "Company", "Role", "Score", "Signed Up", ""].map((h) => (
+                    {["#", "Name", "Email", "Company", "Role", "Score", "Assessed", "Signed Up", ""].map((h) => (
                       <th key={h} className="text-left px-4 py-3 text-[10px] font-black text-[#022f42]/40 uppercase tracking-widest">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u, i) => (
-                    <tr key={u.id} className="border-b border-[#022f42]/5 hover:bg-[#022f42]/2 transition-colors">
+                  {users.map((u, i) => {
+                    const isHighlighted = highlightEmail && u.email.toLowerCase() === highlightEmail.toLowerCase();
+                    return (
+                      <tr key={u.id} className={`border-b border-[#022f42]/5 transition-colors ${isHighlighted ? "bg-[#ffd800]/15 ring-2 ring-inset ring-[#ffd800]" : "hover:bg-[#022f42]/2"}`}>
+                        <td className="px-4 py-3 text-[#022f42]/30 text-xs font-mono">{i + 1}</td>
+                        <td className="px-4 py-3 font-bold text-[#022f42]">
+                          {u.full_name || <span className="text-[#022f42]/30">—</span>}
+                          {u.is_admin && <span className="ml-2 px-1.5 py-0.5 text-[8px] font-black bg-[#ffd800] text-[#022f42] uppercase tracking-widest rounded">Admin</span>}
+                        </td>
+                        <td className="px-4 py-3 text-[#022f42]/70">{u.email}</td>
+                        <td className="px-4 py-3 text-[#022f42]/60">{u.company_name || <span className="text-[#022f42]/30">—</span>}</td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-[#022f42]/5 text-[#022f42]/60 uppercase tracking-widest rounded">{u.role || "startup"}</span>
+                        </td>
+                        <td className="px-4 py-3">{getScoreBadge(u.fundability_score, u.band)}</td>
+                        <td className="px-4 py-3 text-[#022f42]/50 text-xs whitespace-nowrap">
+                          {u.assessment_date ? (
+                            <>
+                              {new Date(u.assessment_date).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}
+                              <br />
+                              <span className="text-[#022f42]/30">{new Date(u.assessment_date).toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" })}</span>
+                            </>
+                          ) : (
+                            <span className="text-[#022f42]/30">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-[#022f42]/50 text-xs whitespace-nowrap">
+                          {new Date(u.created_at).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}
+                          <br />
+                          <span className="text-[#022f42]/30">{new Date(u.created_at).toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" })}</span>
+                        </td>
+                        <td className="px-4 py-3">
+                          {u.report_id ? (
+                            <a href={`/report/${u.report_id}`} target="_blank" rel="noreferrer" className="text-[#022f42]/50 hover:text-[#022f42] transition-colors flex items-center gap-1 text-xs font-bold">
+                              <FileText size={12} /> View
+                            </a>
+                          ) : (
+                            <span className="text-[#022f42]/20"><ExternalLink size={12} /></span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Orphan Reports (Guest Users) */}
+        {orphanReports.length > 0 && (
+          <div className="bg-white border-2 border-[#022f42]/5 shadow-sm overflow-hidden mt-6">
+            <div className="px-6 py-4 border-b border-[#022f42]/5">
+              <h2 className="text-sm font-black text-[#022f42] uppercase tracking-widest">Guest Reports (Unlinked)</h2>
+              <p className="text-[10px] text-[#022f42]/40 mt-1">Reports from users who completed the QuickAssess without logging in.</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#022f42]/3 border-b border-[#022f42]/5">
+                    {["#", "Report ID", "Score", "Band", "Date", ""].map((h) => (
+                      <th key={h} className="text-left px-4 py-3 text-[10px] font-black text-[#022f42]/40 uppercase tracking-widest">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {orphanReports.map((r, i) => (
+                    <tr key={r.id} className="border-b border-[#022f42]/5 hover:bg-[#022f42]/2 transition-colors">
                       <td className="px-4 py-3 text-[#022f42]/30 text-xs font-mono">{i + 1}</td>
-                      <td className="px-4 py-3 font-bold text-[#022f42]">{u.full_name || <span className="text-[#022f42]/30">—</span>}</td>
-                      <td className="px-4 py-3 text-[#022f42]/70">{u.email}</td>
-                      <td className="px-4 py-3 text-[#022f42]/60">{u.company_name || <span className="text-[#022f42]/30">—</span>}</td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 text-[10px] font-bold bg-[#022f42]/5 text-[#022f42]/60 uppercase tracking-widest rounded">{u.role || "startup"}</span>
-                      </td>
-                      <td className="px-4 py-3">{getScoreBadge(u.fundability_score)}</td>
+                      <td className="px-4 py-3 text-[#022f42]/60 text-xs font-mono">{r.id.slice(0, 8)}…</td>
+                      <td className="px-4 py-3">{getScoreBadge(r.score, r.band)}</td>
+                      <td className="px-4 py-3 text-[#022f42]/60">{r.band}</td>
                       <td className="px-4 py-3 text-[#022f42]/50 text-xs whitespace-nowrap">
-                        {new Date(u.created_at).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}
-                        <br />
-                        <span className="text-[#022f42]/30">{new Date(u.created_at).toLocaleTimeString("en-MY", { hour: "2-digit", minute: "2-digit" })}</span>
+                        {new Date(r.created_at).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}
                       </td>
                       <td className="px-4 py-3">
-                        <a href={`https://supabase.com/dashboard/project/${process.env.NEXT_PUBLIC_SUPABASE_URL?.split("//")[1]?.split(".")[0]}/auth/users`} target="_blank" rel="noreferrer" className="text-[#022f42]/30 hover:text-[#022f42] transition-colors">
-                          <ExternalLink size={12} />
+                        <a href={`/report/${r.id}`} target="_blank" rel="noreferrer" className="text-[#022f42]/50 hover:text-[#022f42] transition-colors flex items-center gap-1 text-xs font-bold">
+                          <FileText size={12} /> View
                         </a>
                       </td>
                     </tr>
@@ -227,16 +300,16 @@ export default function AdminUsersPage() {
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Env Status Card */}
         <div className="mt-6 bg-[#022f42] text-white p-6 shadow-xl">
           <h3 className="text-xs font-black uppercase tracking-widest text-[#ffd800] mb-4">Environment Status</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
             {[
-              { label: "TELEGRAM_BOT_TOKEN", ok: true }, // Server-only, we trust it's set
-              { label: "TELEGRAM_ADMIN_CHAT_ID (995198028)", ok: true },
+              { label: "TELEGRAM_BOT_TOKEN", ok: true },
+              { label: "TELEGRAM_ADMIN_CHAT_ID", ok: true },
               { label: "RESEND_API_KEY", ok: true },
               { label: "SUPABASE_SERVICE_ROLE_KEY", ok: true },
               { label: "ANTHROPIC_API_KEY", ok: true },
@@ -247,7 +320,7 @@ export default function AdminUsersPage() {
               </div>
             ))}
           </div>
-          <p className="text-white/30 text-[10px] mt-4 uppercase tracking-widest">Note: Use the "Test Telegram" button above to verify live connectivity.</p>
+          <p className="text-white/30 text-[10px] mt-4 uppercase tracking-widest">Note: Use the &quot;Test Telegram&quot; button above to verify live connectivity.</p>
         </div>
       </div>
     </div>
