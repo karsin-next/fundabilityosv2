@@ -63,8 +63,11 @@ export function DynamicAuditComponent({
   const [savedStatus, setSavedStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [analysis, setAnalysis] = useState<InvestorAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedStatus, setSavedStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [analysis, setAnalysis] = useState<InvestorAnalysis | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [lang, setLang] = useState<"en" | "ms">("en");
 
 
   // 1. Check for existing response on mount
@@ -88,16 +91,34 @@ export function DynamicAuditComponent({
         if (data && data.open_text) {
           try {
             const parsed = JSON.parse(data.open_text);
-            if (parsed.analysis) {
-              setAnalysis(parsed.analysis);
-              // Ensure we have an array of length maxQuestions
-              const restoredAnswers = Array.from({ length: maxQuestions }, (_, i) => parsed.answers[i] || {});
-              setAnswers(restoredAnswers);
-              setSavedStatus("success");
+            let restoredAnswers = [];
+            let restoredAnalysis = null;
+
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              restoredAnswers = parsed.answers || [];
+              restoredAnalysis = parsed.analysis || null;
             } else if (Array.isArray(parsed)) {
-              const restoredAnswers = Array.from({ length: maxQuestions }, (_, i) => parsed[i] || {});
-              setAnswers(restoredAnswers);
-              setSavedStatus("success");
+              restoredAnswers = parsed;
+            }
+
+            if (restoredAnswers.length > 0) {
+              const fullAnswers = Array.from({ length: maxQuestions }, (_, i) => restoredAnswers[i] || {});
+              setAnswers(fullAnswers);
+              
+              if (restoredAnalysis) {
+                setAnalysis(restoredAnalysis);
+                setSavedStatus("success");
+              } else {
+                // If we have answers but no analysis, we might be in a partially completed state
+                // Determine furthest question answered
+                const lastAnsweredIndex = restoredAnswers.findIndex(a => !a.selectedOptionId);
+                if (lastAnsweredIndex === -1) {
+                  // All answered, trigger analysis to get to success state
+                  handleFinalSave();
+                } else {
+                  setCurrentIndex(lastAnsweredIndex);
+                }
+              }
             }
           } catch (e) {
             console.error("Parse error:", e);
@@ -136,7 +157,7 @@ export function DynamicAuditComponent({
     setAnswers(newAnswers);
   };
 
-  const canProceed = Boolean(currentA.selectedOptionId || (currentA.openText && currentA.openText.trim().length > 10));
+  const canProceed = Boolean(currentA.selectedOptionId);
 
 
   const goToNextSlide = async () => {
@@ -216,7 +237,7 @@ export function DynamicAuditComponent({
               score_value: Math.round(finalScore),
               updated_at: new Date().toISOString()
             },
-            { onConflict: "user_id,module_id", ignoreDuplicates: false }
+            { onConflict: 'user_id,module_id' }
           );
 
         if (error) {
@@ -319,14 +340,8 @@ export function DynamicAuditComponent({
          </span>
           <div className="flex items-center gap-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]/40">
-              {lang === 'en' ? 'Step' : 'Langkah'} {currentIndex + 1} / {maxQuestions}
+              Step {currentIndex + 1} / {maxQuestions}
             </span>
-            <button 
-              onClick={() => setLang(lang === 'en' ? 'ms' : 'en')}
-              className="px-2 py-1 bg-[#022f42]/5 hover:bg-[#022f42]/10 text-[9px] font-black uppercase tracking-widest text-[#022f42] rounded-sm transition-colors"
-            >
-              {lang === 'en' ? 'Bahasa Malaysia' : 'English'}
-            </button>
           </div>
       </div>
 
@@ -509,16 +524,13 @@ export function DynamicAuditComponent({
             <div className="flex items-center gap-2 px-1">
               <MessageSquare className="w-3.5 h-3.5 text-[#022f42]" />
               <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]">
-                {lang === 'en' ? 'Qualitative Context (Optional)' : 'Konteks Kualitatif (Pilihan)'}
+                Qualitative Context (Optional)
               </span>
             </div>
             <textarea
               value={currentA.openText || ""}
               onChange={(e) => handleTextChange(e.target.value)}
-              placeholder={lang === 'en' 
-                ? (currentQ?.placeholder || "Add deeper insights here so our AI can calibrate accurately...")
-                : "Tambah pandangan lebih mendalam di sini supaya AI kami dapat menentukur dengan tepat..."
-              }
+              placeholder={currentQ?.placeholder || "Add deeper insights here so our AI can calibrate accurately..."}
               className="w-full bg-[#f8fafc] border-2 border-[#022f42]/5 p-5 text-sm text-[#022f42] min-h-[100px] outline-none focus:border-[#022f42]/20 transition-all font-medium leading-relaxed rounded-sm"
             />
           </div>
@@ -535,14 +547,14 @@ export function DynamicAuditComponent({
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> {lang === 'en' ? 'WRITING TO MAINFRAME...' : 'MENULIS KE MAINFRAME...'}
+                  <Loader2 className="w-4 h-4 animate-spin" /> WRITING TO MAINFRAME...
                 </>
               ) : currentIndex === maxQuestions - 1 ? (
                 <>
-                  <Save className="w-4 h-4" /> {lang === 'en' ? 'CONFIRM & LOCK IN' : 'SAHKAN & KUNCI'}
+                  <Save className="w-4 h-4" /> CONFIRM & LOCK IN
                 </>
               ) : (
-                lang === 'en' ? 'CONFIRM & CONTINUE' : 'SAHKAN & TERUSKAN'
+                'CONFIRM & CONTINUE'
               )}
             </button>
           </div>
