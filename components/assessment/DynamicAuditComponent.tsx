@@ -63,10 +63,7 @@ export function DynamicAuditComponent({
   const [savedStatus, setSavedStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [analysis, setAnalysis] = useState<InvestorAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [savedStatus, setSavedStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
-  const [analysis, setAnalysis] = useState<InvestorAnalysis | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
 
