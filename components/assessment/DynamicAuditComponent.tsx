@@ -64,6 +64,8 @@ export function DynamicAuditComponent({
   const [analysis, setAnalysis] = useState<InvestorAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [lang, setLang] = useState<"en" | "ms">("en");
+
 
   // 1. Check for existing response on mount
   useEffect(() => {
@@ -84,17 +86,21 @@ export function DynamicAuditComponent({
           .single();
 
         if (data && data.open_text) {
-          const parsed = JSON.parse(data.open_text);
-          // If the stored data contains an analysis object, use it
-          if (parsed.analysis) {
-            setAnalysis(parsed.analysis);
-            setAnswers(parsed.answers || []);
-            setSavedStatus("success");
-          } else if (Array.isArray(parsed)) {
-            // Legacy format or just answers, we can still show as success but might need to re-analyze
-            setAnswers(parsed);
-            setSavedStatus("success");
-            // Optionally trigger analysis here if needed
+          try {
+            const parsed = JSON.parse(data.open_text);
+            if (parsed.analysis) {
+              setAnalysis(parsed.analysis);
+              // Ensure we have an array of length maxQuestions
+              const restoredAnswers = Array.from({ length: maxQuestions }, (_, i) => parsed.answers[i] || {});
+              setAnswers(restoredAnswers);
+              setSavedStatus("success");
+            } else if (Array.isArray(parsed)) {
+              const restoredAnswers = Array.from({ length: maxQuestions }, (_, i) => parsed[i] || {});
+              setAnswers(restoredAnswers);
+              setSavedStatus("success");
+            }
+          } catch (e) {
+            console.error("Parse error:", e);
           }
         }
       } catch (e) {
@@ -130,7 +136,8 @@ export function DynamicAuditComponent({
     setAnswers(newAnswers);
   };
 
-  const canProceed = Boolean(currentA.selectedOptionId);
+  const canProceed = Boolean(currentA.selectedOptionId || (currentA.openText && currentA.openText.trim().length > 10));
+
 
   const goToNextSlide = async () => {
     if (!canProceed) return;
@@ -310,9 +317,17 @@ export function DynamicAuditComponent({
          <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]/40">
            Dynamic Audit Sequence
          </span>
-         <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]">
-           Step {currentIndex + 1} / {maxQuestions}
-         </span>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]/40">
+              {lang === 'en' ? 'Step' : 'Langkah'} {currentIndex + 1} / {maxQuestions}
+            </span>
+            <button 
+              onClick={() => setLang(lang === 'en' ? 'ms' : 'en')}
+              className="px-2 py-1 bg-[#022f42]/5 hover:bg-[#022f42]/10 text-[9px] font-black uppercase tracking-widest text-[#022f42] rounded-sm transition-colors"
+            >
+              {lang === 'en' ? 'Bahasa Malaysia' : 'English'}
+            </button>
+          </div>
       </div>
 
       {isSaving ? (
@@ -493,12 +508,17 @@ export function DynamicAuditComponent({
           <div className="space-y-3 mb-8">
             <div className="flex items-center gap-2 px-1">
               <MessageSquare className="w-3.5 h-3.5 text-[#022f42]" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]">Qualitative Context (Optional)</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#022f42]">
+                {lang === 'en' ? 'Qualitative Context (Optional)' : 'Konteks Kualitatif (Pilihan)'}
+              </span>
             </div>
             <textarea
               value={currentA.openText || ""}
               onChange={(e) => handleTextChange(e.target.value)}
-              placeholder={currentQ?.placeholder || "Add deeper insights here so our AI can calibrate accurately..."}
+              placeholder={lang === 'en' 
+                ? (currentQ?.placeholder || "Add deeper insights here so our AI can calibrate accurately...")
+                : "Tambah pandangan lebih mendalam di sini supaya AI kami dapat menentukur dengan tepat..."
+              }
               className="w-full bg-[#f8fafc] border-2 border-[#022f42]/5 p-5 text-sm text-[#022f42] min-h-[100px] outline-none focus:border-[#022f42]/20 transition-all font-medium leading-relaxed rounded-sm"
             />
           </div>
@@ -506,23 +526,23 @@ export function DynamicAuditComponent({
           <div className="mt-auto pt-6 border-t border-gray-100 flex justify-end">
             <button
               onClick={goToNextSlide}
-              disabled={!canProceed || isSaving}
+              disabled={!canProceed || isSaving || isLoadingNext}
               className={`px-8 py-4 font-black flex items-center justify-center gap-3 text-[10px] uppercase tracking-widest transition-all rounded-sm shadow-md ${
-                !canProceed
+                (!canProceed || isSaving || isLoadingNext)
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-[#ffd800] text-[#022f42] hover:bg-[#022f42] hover:text-[#ffd800]'
               }`}
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> WRITING TO MAINFRAME...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {lang === 'en' ? 'WRITING TO MAINFRAME...' : 'MENULIS KE MAINFRAME...'}
                 </>
               ) : currentIndex === maxQuestions - 1 ? (
                 <>
-                  <Save className="w-4 h-4" /> LOCK IN RESPONSE
+                  <Save className="w-4 h-4" /> {lang === 'en' ? 'CONFIRM & LOCK IN' : 'SAHKAN & KUNCI'}
                 </>
               ) : (
-                "CONFIRM & CONTINUE"
+                lang === 'en' ? 'CONFIRM & CONTINUE' : 'SAHKAN & TERUSKAN'
               )}
             </button>
           </div>

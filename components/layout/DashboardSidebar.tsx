@@ -46,9 +46,9 @@ const siteMap: NavSection[] = [
           { name: "1.1.5 Market Opportunity", href: "/dashboard/audit/5-market", icon: Globe },
           { name: "1.1.6 Product‑Market Fit & Traction", href: "/dashboard/audit/6-pmf", icon: TrendingUp },
           { name: "1.1.7 Revenue Model Explorer", href: "/dashboard/audit/7-revenue", icon: DollarSign },
+          { name: "1.1.8 Team Composition Audit", href: "/dashboard/audit/8-team", icon: HeartHandshake },
           { name: "1.1.9 Financial Snapshot", href: "/dashboard/audit/9-financial-snapshot", icon: DollarSign },
           { name: "1.1.10 Fundraising Ask", href: "/dashboard/audit/10-fundraising-ask", icon: PieChart },
-          { name: "1.1.8 Team Composition Audit", href: "/dashboard/audit/8-team", icon: HeartHandshake },
         ],
       },
       {
@@ -294,9 +294,15 @@ export function DashboardSidebar() {
             return (
               <div key={section.label}>
                 {/* Section header */}
-                <button 
-                  onClick={() => !section.isLocked && toggleSection(section.label)}
-                  disabled={section.isLocked}
+                <Link 
+                  href={section.items[0]?.href || "#"} 
+                  onClick={(e) => {
+                    if (section.isLocked) {
+                      e.preventDefault();
+                      return;
+                    }
+                    toggleSection(section.label);
+                  }}
                   className={`w-full px-2.5 mb-1 flex items-center justify-between group ${
                     section.isLocked ? "cursor-not-allowed opacity-50" : ""
                   }`}
@@ -316,7 +322,7 @@ export function DashboardSidebar() {
                   {!section.isLocked && (
                     <ChevronRight className={`w-3 h-3 text-[#b0d0e0]/30 transition-transform duration-300 ${isExpanded ? "rotate-90 text-[#ffd800]" : ""}`} />
                   )}
-                </button>
+                </Link>
 
                 {/* Sub-menu with Tailwind Transition */}
                 <div 

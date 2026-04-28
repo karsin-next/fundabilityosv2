@@ -20,6 +20,8 @@ const subModules = [
   { id: "6-pmf", title: "Product-Market Fit Probe", icon: TrendingUp, desc: "Vitamin vs. Painkiller analysis.", status: "not_started", time: "3 min" },
   { id: "7-revenue", title: "Revenue Model Explorer", icon: BarChart3, desc: "Pricing power and margins.", status: "not_started", time: "4 min" },
   { id: "8-team", title: "Team Composition Audit", icon: Users, desc: "Founding team strength and gaps.", status: "not_started", time: "3 min" },
+  { id: "9-financial-snapshot", title: "Financial Snapshot", icon: DollarSign, desc: "Current revenue, burn, and runway.", status: "not_started", time: "3 min" },
+  { id: "10-fundraising-ask", title: "Fundraising Ask", icon: PieChart, desc: "Target raise, use of funds, and timeline.", status: "not_started", time: "3 min" },
 ];
 
 export default function AuditHubPage() {
@@ -234,7 +236,7 @@ export default function AuditHubPage() {
           <div className="w-3 h-3 bg-red-500 animate-pulse" />
           Institutional Due Diligence Gates
         </h2>
-        <div className="text-[10px] font-bold text-[#022f42]/40 uppercase tracking-[0.2em]">8 MANDATORY GATES</div>
+        <div className="text-[10px] font-bold text-[#022f42]/40 uppercase tracking-[0.2em]">10 MANDATORY GATES</div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-20">
